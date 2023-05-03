@@ -8,3 +8,9 @@ class User(models.Model):
     password = models.CharField(max_length=200)
     def __str__(self):
         return self.name + " " + self.email
+
+class VerifyEmail(models.Model):
+    email = models.CharField(max_length=200, primary_key=True)
+    verification_code = models.CharField(max_length=200)
+    def __str__(self):
+        return self.email + " " + self.verification_code

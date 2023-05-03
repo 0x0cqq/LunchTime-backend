@@ -3,6 +3,23 @@
 
 ## 一、用户相关
 
+### 获取邮箱验证码
+- POST: /api/verify_email
+- Param:
+
+```json
+{
+    "email":
+}
+```
+
+- Response:
+```json
+{
+    "status":  , //True or False
+    "message": , //Error message
+}
+```
 ### 用户注册
 - POST: /api/register
 - Param:
@@ -19,8 +36,8 @@
 - Response
 ```json
 {
-    "status": ,  //True or False
-    "message": , //Error message
+    "status": ,  
+    "message": , 
 }
 ```
 
