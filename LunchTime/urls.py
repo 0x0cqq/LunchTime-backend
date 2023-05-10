@@ -7,4 +7,7 @@ urlpatterns = [
     path("verify_email", views.verify_email, name="verify_email"),
     path("register", views.register, name="register"),
     path("login", views.login, name="login"),
+    path("get_posts_by_time", views.getPostsByTime, name="get_posts_by_time"),
+    path("get_post_detail", views.getPostDetail, name="get_post_detail"),
+    path("post", views.post, name="post"),
 ]
