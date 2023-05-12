@@ -7,9 +7,43 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from time import time
+
+root_url = "http://lunchtime.cqqqwq.com:8000"
 # Create your views here.
 def index(request):
     return HttpResponse("Hello, world. You're at the LunchTime index.")
+
+def register_without_verification(request):
+    res = {}
+    if request.method != 'POST':
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        name = request.POST.get('name')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        # check if name exists
+        query = User.objects.filter(name=name)
+        if query:
+            res['status'] = False
+            res['message'] = 'name exists'
+            return JsonResponse(res)
+        # check if email exists
+        query = User.objects.filter(email=email)
+        if query:
+            res['status'] = False
+            res['message'] = 'email exists'
+            return JsonResponse(res)
+        # add new user to database
+        user = User(name=name, password=password, email=email)
+        user.save()
+        res['status'] = True
+        res['message'] = 'ok'
+    except:
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
 
 @api_view(['POST'])
 def verify_email(request):
@@ -145,7 +179,7 @@ def getPostsByTime(request):
             # get picture list
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
-                tmp['picture'].append(q.url)
+                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
         res['status'] = True
         res['message'] = 'ok'
@@ -188,7 +222,7 @@ def getPostDetail(request):
         res['picture'] = []
         queries = PostPicture.objects.filter(post_id=post_id)
         for q in queries:
-            res['picture'].append(q.url)
+            res['picture'].append(root_url + "/media/postImage/" + q.url)
         # add comment list
         res['comments'] = []
         queries = PostComment.objects.filter(post_id=post_id)
@@ -239,9 +273,9 @@ def post(request):
         # get picture list
         files = request.FILES.getlist('picture')
         print("files:", files)
-        for file in files:
+        for index, file in enumerate(files):
             print("file:", file)
-            file_name = str(int(time())) + '.' + file.name.split('.')[-1]
+            file_name =  str(int(time())) + "_" + str(index) + '.' + file.name.split('.')[-1]
             file_path = './media/postImage/' + file_name
             if file.name.split('.')[-1] not in ['jpeg','jpg','png']:
                 res['status'] = False
@@ -250,7 +284,7 @@ def post(request):
             with open(file_path,'wb+') as f:
                 f.write(file.read())
             # add picture to database
-            picture = PostPicture(post_id=post.id, url=file_name)
+            picture = PostPicture(post_id=post.post_id, url=file_name)
             picture.save()
         res['status'] = True
         res['message'] = "ok"
