@@ -195,7 +195,7 @@ def getPostsByTime(request):
 @api_view(['GET'])
 def getPostByPopularity(request):
     pass
-0
+
 @api_view(['GET'])
 def getPostByAttention(request):
     pass
