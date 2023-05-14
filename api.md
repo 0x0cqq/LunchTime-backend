@@ -203,3 +203,57 @@
     "post_id":,
 }
 ```
+
+### 对帖子点赞/取消点赞
+- POST: api/love_post
+- Param:
+```json
+{
+    "user_name":,
+    "post_id":,
+}
+```
+- Response:
+```json
+{
+    "status": ,
+    "message":,
+    "result":, //result=1, 点赞成功; result=0, 取消点赞成功
+}
+```
+
+### 对帖子评论
+- POST: api/comment_post
+- Param:
+```json
+{
+    "user_name":,
+    "post_id":,
+    "comment":,
+}
+```
+- Response:
+```json
+{
+    "status": ,
+    "message":,
+}
+```
+
+### 对帖子收藏/取消收藏
+- POST: api/save_post
+- Param:
+```json
+{
+    "user_name":,
+    "post_id":,
+}
+```
+- Response:
+```json
+{
+    "status": ,
+    "message":,
+    "result":,
+}
+```

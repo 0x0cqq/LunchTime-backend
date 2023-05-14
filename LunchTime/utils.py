@@ -20,3 +20,6 @@ def send_email(receiver_email):
         smtp.quit()
     
     return verification_code
+
+def calculate_popularity(like_count, comment_count, save_count):
+    return like_count + comment_count + save_count

@@ -13,4 +13,7 @@ urlpatterns = [
     path("get_post_by_attention", views.getPostByAttention, name="get_post_by_attention"),
     path("get_post_detail", views.getPostDetail, name="get_post_detail"),
     path("post", views.post, name="post"),
+    path("love_post", views.lovePost, name="love_post"),
+    path("save_post", views.savePost, name="save_post"),
+    path("comment_post", views.commentPost, name="comment_post"),
 ]

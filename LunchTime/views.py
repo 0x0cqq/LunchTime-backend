@@ -182,9 +182,10 @@ def getPostsByTime(request):
             for q in queries:
                 tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
+        sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
         res['status'] = True
         res['message'] = 'ok'
-        res['posts'] = posts
+        res['posts'] = sorted_posts
 
     except Exception as e:
         print(e)
@@ -194,7 +195,46 @@ def getPostsByTime(request):
 
 @api_view(['GET'])
 def getPostByPopularity(request):
-    pass
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        user_name = request.POST.get('user_name')
+        # get all posts
+        objects = Post.objects.all()
+        posts = []
+        for post in objects:
+            tmp = {}
+            query = User.objects.filter(id=post.user_id)
+            user_name = query[0].name
+            tmp['post_id'] = post.post_id
+            tmp['user_name'] = user_name
+            tmp['create_time'] = post.create_time
+            tmp['tag'] = post.tag
+            tmp['title'] = post.title
+            tmp['content'] = post.content
+            tmp['location'] = post.location
+            tmp['love_count'] = post.love_count
+            tmp['comment_count'] = post.comment_count
+            tmp['save_count'] = post.save_count
+            tmp['picture'] = []
+            # get picture list
+            queries = PostPicture.objects.filter(post_id=post.post_id)
+            for q in queries:
+                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+            posts.append(tmp)
+        sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
+        res['status'] = True
+        res['message'] = 'ok'
+        res['posts'] = sorted_posts
+    
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
 
 @api_view(['GET'])
 def getPostByAttention(request):
@@ -233,7 +273,7 @@ def getPostDetail(request):
         for q in queries:
             res['picture'].append(root_url + "/media/postImage/" + q.url)
         # add comment list
-        res['comments'] = []
+        comments = []
         queries = PostComment.objects.filter(post_id=post_id)
         for q in queries:
             tmp = {}
@@ -241,7 +281,10 @@ def getPostDetail(request):
             tmp['user_name'] = query[0].name
             tmp['content'] = q.comment
             tmp['create_time'] = str(q.create_time)
-            res['comments'].append(tmp)
+            comments.append(tmp)
+        # sorted by create_time
+        # sorted_comments = sorted(comments, key=lambda x: x["create_time"], reverse=False)
+        res['comments'] = comments
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
@@ -276,7 +319,7 @@ def post(request):
         create_time = create_time.strftime("%Y-%m-%d %H:%M:%S")
         # add new post to database
         post = Post(user_id=user_id, tag=tag, title=title, content=content, location=location, create_time=create_time,
-            love_count=0, comment_count=0, save_count=0)
+            love_count=0, comment_count=0, save_count=0, popularity=0)
         post.save()
 
         # get picture list
@@ -299,6 +342,152 @@ def post(request):
         res['message'] = "ok"
         res['post_id'] = post.post_id
 
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def lovePost(request):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        post_id = request.POST.get('post_id')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query[0].id
+        # check if post exists
+        query = Post.objects.filter(post_id=post_id)
+        if not query:
+            res['status'] = False
+            res['message'] = 'post does not exist'
+            return JsonResponse(res)
+        post = query.first()
+        # check if user has loved this post
+        query = PostLove.objects.filter(user_id=user_id, post_id=post_id)
+        if query:
+            # cancel love
+            query.delete()
+            # update post love count and popularity
+            post.popularity = calculate_popularity(post.love_count - 1, post.comment_count, post.save_count)
+            post.love_count -= 1
+            post.save()
+            res['result'] = 0
+        else:
+            # add love
+            love = PostLove(user_id=user_id, post_id=post_id)
+            love.save()
+            # update post love count and popularity
+            post.popularity = calculate_popularity(post.love_count + 1, post.comment_count, post.save_count)
+            post.love_count += 1
+            post.save()
+            res['result'] = 1
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def commentPost(request):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        post_id = request.POST.get('post_id')
+        comment = request.POST.get('comment')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query[0].id
+        # check if post exists
+        query = Post.objects.filter(post_id=post_id)
+        if not query:
+            res['status'] = False
+            res['message'] = 'post does not exist'
+            return JsonResponse(res)
+        post = query.first()
+        # add comment
+        comment = PostComment(user_id=user_id, post_id=post_id, comment=comment)
+        comment.save()
+        # update post comment count and popularity
+        post.popularity = calculate_popularity(post.love_count, post.comment_count + 1, post.save_count)
+        post.comment_count += 1
+        post.save()
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+
+@api_view(['POST'])
+def savePost(request):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        post_id = request.POST.get('post_id')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query[0].id
+        # check if post exists
+        query = Post.objects.filter(post_id=post_id)
+        if not query:
+            res['status'] = False
+            res['message'] = 'post does not exist'
+            return JsonResponse(res)
+        post = query.first()
+        # check if user has saved this post
+        query = PostSave.objects.filter(user_id=user_id, post_id=post_id)
+        if query:
+            # cancel save
+            query.delete()
+            # update post save count
+            post.popularity = calculate_popularity(post.love_count, post.comment_count, post.save_count - 1)
+            post.save_count -= 1
+            post.save()
+            res['result'] = 0
+        else:
+            # add save
+            save = PostSave(user_id=user_id, post_id=post_id)
+            save.save()
+            # update post save count and popularity
+            post.popularity = calculate_popularity(post.love_count, post.comment_count, post.save_count + 1)
+            post.save_count += 1
+            post.save()
+            res['result'] = 1
+        res['status'] = True
+        res['message'] = 'ok'
     except Exception as e:
         print(e)
         res['status'] = False

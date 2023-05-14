@@ -7,7 +7,11 @@ class User(models.Model):
     email = models.CharField(max_length=200)
     password = models.CharField(max_length=200)
     def __str__(self):
-        return self.name + " " + self.email
+        return self.id + " " + self.name
+
+class UserAttention(models.Model):
+    user_id = models.IntegerField()
+    attention_user_id = models.IntegerField()
 
 class VerifyEmail(models.Model):
     email = models.CharField(max_length=200, primary_key=True)
@@ -26,6 +30,7 @@ class Post(models.Model):
     love_count = models.IntegerField()
     comment_count = models.IntegerField()
     save_count = models.IntegerField()
+    popularity = models.IntegerField()
 
 class PostPicture(models.Model):
     post_id = models.IntegerField()
@@ -34,14 +39,17 @@ class PostPicture(models.Model):
 class PostLove(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
+    def __str__(self):
+        return "postId: " + str(self.post_id) + "  userId: " + str(self.user_id)
 
 class PostSave(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
+    def __str__(self):
+        return "postId: " + str(self.post_id) + "  userId: " + str(self.user_id)
 
 class PostComment(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
-    index = models.IntegerField()
     create_time = models.DateField(auto_now=True)
     comment = models.CharField(max_length=200)
