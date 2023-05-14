@@ -493,3 +493,84 @@ def savePost(request):
         res['status'] = False
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
+
+@api_view(['GET'])
+def getNoticeLove(request):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # get user's post list
+        query = Post.objects.filter(user_id=user_id)
+        post_ids = []
+        for item in query:
+            post_ids.append(item.post_id)
+        # get user's love list
+        loveList = []
+        query = PostLove.objects.filter(post_id__in=post_ids)
+        for item in query:
+            tmp = {}
+            tmp['post_id'] = item.post_id
+            tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
+            tmp['create_time'] = item.create_time
+            loveList.append(tmp)
+        res['loveList'] = loveList
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['GET'])
+def getNoticeComment(request):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # get user's post list
+        query = Post.objects.filter(user_id=user_id)
+        post_ids = []
+        for item in query:
+            post_ids.append(item.post_id)
+        # get user's comment list
+        commentList = []
+        query = PostComment.objects.filter(post_id__in=post_ids)
+        for item in query:
+            tmp = {}
+            tmp['post_id'] = item.post_id
+            tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
+            tmp['create_time'] = item.create_time
+            tmp['content'] = item.comment
+            commentList.append(tmp)
+        res['commentList'] = commentList
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)

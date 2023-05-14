@@ -1,5 +1,5 @@
 backend/__pycache__
 LunchTime/__pycache__
 LunchTime/migrations/__pycache__
-LunchTime/media
+media/*
 db.sqlite3

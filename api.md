@@ -1,7 +1,7 @@
 # API文档
 - 参数以表单形式从前端发送
 
-## 一、用户相关
+## 一、登录相关
 
 ### 获取邮箱验证码
 - POST: /api/verify_email
@@ -120,7 +120,7 @@
 }
 ```
 
-### 按关注获取帖子
+### 按关注获取帖子(Unfinished)
 - GET: api/get_posts_by_attention
 - Param:
 ```json
@@ -255,5 +255,55 @@
     "status": ,
     "message":,
     "result":,
+}
+```
+
+## 三、通知相关
+### 获取评论通知列表
+- GET: api/get_notice_comment
+- Param:
+```json
+{
+    "user_name":,
+}
+```
+- Response
+```json
+{
+    "commentlist":[
+        {
+            "user_name":,
+            "user_image":, //用户头像，目前还不支持
+            "create_time":,
+            "content":,
+            "post_id":, //评论的帖子id
+        },
+    ],
+    "status":,
+    "message":,
+}
+```
+
+### 获取赞通知列表
+- GET: api/get_notice_love
+- Param:
+```json
+{
+    "user_name":,
+}
+```
+- Response
+```json
+{
+    "lovelist":[
+        {
+            "user_name":,
+            "user_image":,
+            "create_time":,
+            "post_id":,
+        },
+    ],
+    "status":,
+    "message":,
 }
 ```

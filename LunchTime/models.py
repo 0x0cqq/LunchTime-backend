@@ -7,7 +7,7 @@ class User(models.Model):
     email = models.CharField(max_length=200)
     password = models.CharField(max_length=200)
     def __str__(self):
-        return self.id + " " + self.name
+        return str(self.id) + " " + self.name
 
 class UserAttention(models.Model):
     user_id = models.IntegerField()
@@ -39,12 +39,14 @@ class PostPicture(models.Model):
 class PostLove(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
+    create_time = models.DateField(auto_now=True)
     def __str__(self):
         return "postId: " + str(self.post_id) + "  userId: " + str(self.user_id)
 
 class PostSave(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
+    create_time = models.DateField(auto_now=True)
     def __str__(self):
         return "postId: " + str(self.post_id) + "  userId: " + str(self.user_id)
 
