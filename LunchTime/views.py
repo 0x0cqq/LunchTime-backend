@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from time import time
 
-root_url = "http://lunchtime.cqqqwq.com:8000"
+root_url = "http://localhost:8000"
+# root_url = "http://lunchtime.cqqqwq.com:8000"
 # Create your views here.
 def index(request):
     return HttpResponse("Hello, world. You're at the LunchTime index.")
@@ -149,10 +150,10 @@ def login(request):
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def getPostsByTime(request):
     res = {}
-    if request.method != "POST":
+    if request.method != "GET":
         res['status'] = False
         res['message'] = 'false method'
         return JsonResponse(res)
@@ -191,10 +192,18 @@ def getPostsByTime(request):
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
 
-@api_view(['POST'])
+@api_view(['GET'])
+def getPostByPopularity(request):
+    pass
+0
+@api_view(['GET'])
+def getPostByAttention(request):
+    pass
+
+@api_view(['GET'])
 def getPostDetail(request):
     res = {}
-    if request.method != "POST":
+    if request.method != "GET":
         res['status'] = False
         res['message'] = 'false method'
         return JsonResponse(res)

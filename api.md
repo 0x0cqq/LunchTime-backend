@@ -63,7 +63,7 @@
 ## 二、帖子相关
 
 ### 按时间线获取帖子
-- POST: api/get_posts_by_time
+- GET: api/get_posts_by_time
 - Param:
 ```json
 {
@@ -92,11 +92,65 @@
 ```
 
 ### 按热度获取帖子
+- GET: api/get_posts_by_popularity
+- Param:
+```json
+{
+    "user_name":
+}
+```
+- Response
+```json
+{
+    "status": ,
+    "message": ,
+    "posts":
+        [{"post_id": ,
+         "user_name": ,
+         "create_time":,
+         "tag":,
+         "title":,
+         "content":,
+         "picture":[] , //其中为图片的url链接
+         "location":,
+         "love_count":,
+         "comment_count":,
+         "save_count":,},
+        ]
+}
+```
 
 ### 按关注获取帖子
+- GET: api/get_posts_by_attention
+- Param:
+```json
+{
+    "user_name":
+}
+```
+- Response
+```json
+{
+    "status": ,
+    "message": ,
+    "posts":
+        [{"post_id": ,
+         "user_name": ,
+         "create_time":,
+         "tag":,
+         "title":,
+         "content":,
+         "picture":[] , //其中为图片的url链接
+         "location":,
+         "love_count":,
+         "comment_count":,
+         "save_count":,},
+        ]
+}
+```
 
 ### 获取某个帖子的详细信息
-- POST: api/get_post_detail
+- GET: api/get_post_detail
 - Param:
 ```json
 {
