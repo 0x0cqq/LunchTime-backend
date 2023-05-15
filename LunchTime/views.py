@@ -60,7 +60,7 @@ def verify_email(request):
         # add VerifyEmail to database
         query = VerifyEmail.objects.filter(email=email)
         if query:
-            verify_email = query[0]
+            verify_email = query.first()
             verify_email.verification_code = verification_code
             verify_email.save()
         else:
@@ -104,7 +104,7 @@ def register(request):
             res['message'] = 'No verfication code sent'
             return JsonResponse(res)
         if query:
-            verify_email = query[0]
+            verify_email = query.first()
             if verification != verify_email.verification_code:
                 res['status'] = False
                 res['message'] = 'wrong verification code'
@@ -162,6 +162,10 @@ def getPosts(request):
         type = request.POST.get('type')
         # get user id
         query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
         user_id = query.first().id
         # get all posts
         objects = Post.objects.all()
@@ -230,16 +234,20 @@ def getPostDetail(request):
         # get user id
         query = User.objects.filter(name=user_name)
         user_id = query.first().id
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
         # get post
         query = Post.objects.filter(post_id=post_id)
         if not query:
             res['status'] = False
             res['message'] = 'post does not exist'
             return JsonResponse(res)
-        post = query[0]
+        post = query.first()
         tmp = {}
         query = User.objects.filter(id=post.user_id)
-        post_user_name = query[0].name
+        post_user_name = query.first().name
         tmp['user_name'] = post_user_name
         tmp['post_id'] = post.post_id
         tmp['create_time'] = post.create_time
@@ -274,7 +282,7 @@ def getPostDetail(request):
         for q in queries:
             tmp = {}
             query = User.objects.filter(id=q.user_id)
-            tmp['user_name'] = query[0].name
+            tmp['user_name'] = query.first().name
             tmp['content'] = q.comment
             tmp['create_time'] = str(q.create_time)
             comments.append(tmp)
@@ -308,7 +316,7 @@ def post(request):
             res['status'] = False
             res['message'] = 'user does not exist'
             return JsonResponse(res)
-        user_id = query[0].id
+        user_id = query.first().id
         # get current time
         create_time = timezone.now()
         create_time = timezone.localtime(create_time)
@@ -361,7 +369,7 @@ def lovePost(request):
             res['status'] = False
             res['message'] = 'user does not exist'
             return JsonResponse(res)
-        user_id = query[0].id
+        user_id = query.first().id
         # check if post exists
         query = Post.objects.filter(post_id=post_id)
         if not query:
@@ -414,7 +422,7 @@ def commentPost(request):
             res['status'] = False
             res['message'] = 'user does not exist'
             return JsonResponse(res)
-        user_id = query[0].id
+        user_id = query.first().id
         # check if post exists
         query = Post.objects.filter(post_id=post_id)
         if not query:
@@ -455,7 +463,7 @@ def savePost(request):
             res['status'] = False
             res['message'] = 'user does not exist'
             return JsonResponse(res)
-        user_id = query[0].id
+        user_id = query.first().id
         # check if post exists
         query = Post.objects.filter(post_id=post_id)
         if not query:
