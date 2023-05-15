@@ -151,7 +151,7 @@ def login(request):
     return JsonResponse(res)
 
 @api_view(['GET'])
-def getPostsByTime(request):
+def getPosts(request):
     res = {}
     if request.method != "GET":
         res['status'] = False
@@ -159,15 +159,19 @@ def getPostsByTime(request):
         return JsonResponse(res)
     try:
         user_name = request.POST.get('user_name')
+        type = request.POST.get('type')
+        # get user id
+        query = User.objects.filter(name=user_name)
+        user_id = query.first().id
         # get all posts
         objects = Post.objects.all()
         posts = []
         for post in objects:
             tmp = {}
             query = User.objects.filter(id=post.user_id)
-            user_name = query[0].name
+            post_user_name = query.first().name
             tmp['post_id'] = post.post_id
-            tmp['user_name'] = user_name
+            tmp['user_name'] = post_user_name
             tmp['create_time'] = post.create_time
             tmp['tag'] = post.tag
             tmp['title'] = post.title
@@ -177,12 +181,31 @@ def getPostsByTime(request):
             tmp['comment_count'] = post.comment_count
             tmp['save_count'] = post.save_count
             tmp['picture'] = []
+            tmp['popularity'] = post.popularity
+            # check if user has loved this post
+            query = PostLove.objects.filter(post_id=post.post_id, user_id=user_id)
+            if query:
+                tmp['is_loved'] = True
+            else:
+                tmp['is_loved'] = False
+            # check if user has saved this post
+            query = PostSave.objects.filter(post_id=post.post_id, user_id=user_id)
+            if query:
+                tmp['is_saved'] = True
+            else:
+                tmp['is_saved'] = False
             # get picture list
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
                 tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
-        sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
+        if type == 1:
+            sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
+        elif type == 2:
+            sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
+        else:
+            sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
+            # TODO: filter by attention
         res['status'] = True
         res['message'] = 'ok'
         res['posts'] = sorted_posts
@@ -193,52 +216,6 @@ def getPostsByTime(request):
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
 
-@api_view(['GET'])
-def getPostByPopularity(request):
-    res = {}
-    if request.method != "GET":
-        res['status'] = False
-        res['message'] = 'false method'
-        return JsonResponse(res)
-    try:
-        user_name = request.POST.get('user_name')
-        # get all posts
-        objects = Post.objects.all()
-        posts = []
-        for post in objects:
-            tmp = {}
-            query = User.objects.filter(id=post.user_id)
-            user_name = query[0].name
-            tmp['post_id'] = post.post_id
-            tmp['user_name'] = user_name
-            tmp['create_time'] = post.create_time
-            tmp['tag'] = post.tag
-            tmp['title'] = post.title
-            tmp['content'] = post.content
-            tmp['location'] = post.location
-            tmp['love_count'] = post.love_count
-            tmp['comment_count'] = post.comment_count
-            tmp['save_count'] = post.save_count
-            tmp['picture'] = []
-            # get picture list
-            queries = PostPicture.objects.filter(post_id=post.post_id)
-            for q in queries:
-                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
-            posts.append(tmp)
-        sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
-        res['status'] = True
-        res['message'] = 'ok'
-        res['posts'] = sorted_posts
-    
-    except Exception as e:
-        print(e)
-        res['status'] = False
-        res['message'] = 'unexpected parameters'
-    return JsonResponse(res)
-
-@api_view(['GET'])
-def getPostByAttention(request):
-    pass
 
 @api_view(['GET'])
 def getPostDetail(request):
@@ -250,6 +227,9 @@ def getPostDetail(request):
     try:
         user_name = request.POST.get('user_name')
         post_id = request.POST.get('post_id')
+        # get user id
+        query = User.objects.filter(name=user_name)
+        user_id = query.first().id
         # get post
         query = Post.objects.filter(post_id=post_id)
         if not query:
@@ -257,16 +237,32 @@ def getPostDetail(request):
             res['message'] = 'post does not exist'
             return JsonResponse(res)
         post = query[0]
-        res['user_name'] = user_name
-        res['post_id'] = post.post_id
-        res['create_time'] = post.create_time
-        res['tag'] = post.tag
-        res['title'] = post.title
-        res['content'] = post.content
-        res['location'] = post.location
-        res['love_count'] = post.love_count
-        res['save_count'] = post.save_count
-        res['comment_count'] = post.comment_count
+        tmp = {}
+        query = User.objects.filter(id=post.user_id)
+        post_user_name = query[0].name
+        tmp['user_name'] = post_user_name
+        tmp['post_id'] = post.post_id
+        tmp['create_time'] = post.create_time
+        tmp['tag'] = post.tag
+        tmp['title'] = post.title
+        tmp['content'] = post.content
+        tmp['location'] = post.location
+        tmp['love_count'] = post.love_count
+        tmp['save_count'] = post.save_count
+        tmp['comment_count'] = post.comment_count
+        # check if user has loved this post
+        query = PostLove.objects.filter(post_id=post_id, user_id=user_id)
+        if query:
+            tmp['is_loved'] = True
+        else:
+            tmp['is_loved'] = False
+        # check if user has saved this post
+        query = PostSave.objects.filter(post_id=post_id, user_id=user_id)
+        if query:
+            tmp['is_saved'] = True
+        else:
+            tmp['is_saved'] = False
+        res['post'] = tmp
         # add picture list
         res['picture'] = []
         queries = PostPicture.objects.filter(post_id=post_id)

@@ -62,12 +62,13 @@
 
 ## 二、帖子相关
 
-### 按时间线获取帖子
-- GET: api/get_posts_by_time
+### 按时间线/热度/关注获取帖子
+- GET: api/posts
 - Param:
 ```json
 {
-    "user_name":
+    "user_name":,
+    "type":, // 1->time 2->popularity (TODO)3->attention
 }
 ```
 - Response
@@ -75,82 +76,27 @@
 {
     "status": ,
     "message": ,
-    "posts":
-        [{"post_id": ,
-         "user_name": ,
-         "create_time":,
-         "tag":,
-         "title":,
-         "content":,
-         "picture":[] , //其中为图片的url链接
-         "location":,
-         "love_count":,
-         "comment_count":,
-         "save_count":,},
-        ]
-}
-```
-
-### 按热度获取帖子
-- GET: api/get_posts_by_popularity
-- Param:
-```json
-{
-    "user_name":
-}
-```
-- Response
-```json
-{
-    "status": ,
-    "message": ,
-    "posts":
-        [{"post_id": ,
-         "user_name": ,
-         "create_time":,
-         "tag":,
-         "title":,
-         "content":,
-         "picture":[] , //其中为图片的url链接
-         "location":,
-         "love_count":,
-         "comment_count":,
-         "save_count":,},
-        ]
-}
-```
-
-### 按关注获取帖子(Unfinished)
-- GET: api/get_posts_by_attention
-- Param:
-```json
-{
-    "user_name":
-}
-```
-- Response
-```json
-{
-    "status": ,
-    "message": ,
-    "posts":
-        [{"post_id": ,
-         "user_name": ,
-         "create_time":,
-         "tag":,
-         "title":,
-         "content":,
-         "picture":[] , //其中为图片的url链接
-         "location":,
-         "love_count":,
-         "comment_count":,
-         "save_count":,},
-        ]
+    "posts":[{
+        "post_id": ,
+        "user_name": ,
+        "create_time":,
+        "tag":,
+        "title":,
+        "content":,
+        "picture":[] , //其中为图片的url链接
+        "location":,
+        "love_count":,
+        "comment_count":,
+        "save_count":,
+        "is_loved":,  //True or False
+        "is_saved":,
+        },
+    ]
 }
 ```
 
 ### 获取某个帖子的详细信息
-- GET: api/get_post_detail
+- GET: api/post_detail
 - Param:
 ```json
 {
@@ -163,17 +109,21 @@
 {   
     "status":,
     "message":,
-    "post_id": ,
-    "user_name": ,
-    "create_time":,
-    "tag":,
-    "title":,
-    "content":,
-    "picture":[] , //其中为图片的url链接
-    "location":,
-    "love_count":,
-    "comment_count":,
-    "save_count":,
+    "post":{
+        "post_id": ,
+        "user_name": ,
+        "create_time":,
+        "tag":,
+        "title":,
+        "content":,
+        "picture":[] , //其中为图片的url链接
+        "location":,
+        "love_count":,
+        "comment_count":,
+        "save_count":,
+        "is_loved":,
+        "is_saved":,
+    }, 
     "comment":[{
         "user_name": ,
         "content": ,
@@ -260,7 +210,7 @@
 
 ## 三、通知相关
 ### 获取评论通知列表
-- GET: api/get_notice_comment
+- GET: api/notice_comment
 - Param:
 ```json
 {
@@ -285,7 +235,7 @@
 ```
 
 ### 获取赞通知列表
-- GET: api/get_notice_love
+- GET: api/notice_love
 - Param:
 ```json
 {
