@@ -529,7 +529,7 @@ def getNoticeLove(request):
             tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
             tmp['create_time'] = item.create_time
             loveList.append(tmp)
-        res['loveList'] = loveList
+        res['notice_list'] = loveList
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
@@ -570,7 +570,7 @@ def getNoticeComment(request):
             tmp['create_time'] = item.create_time
             tmp['content'] = item.comment
             commentList.append(tmp)
-        res['commentList'] = commentList
+        res['notice_list'] = commentList
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:

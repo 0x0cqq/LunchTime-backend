@@ -220,7 +220,7 @@
 - Response
 ```json
 {
-    "commentlist":[
+    "notice_list":[
         {
             "user_name":,
             "user_image":, //用户头像，目前还不支持
@@ -245,7 +245,7 @@
 - Response
 ```json
 {
-    "lovelist":[
+    "notice_list":[
         {
             "user_name":,
             "user_image":,
