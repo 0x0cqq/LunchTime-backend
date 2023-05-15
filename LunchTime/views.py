@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils import timezone
 from LunchTime.models import *
 from LunchTime.utils import *
@@ -12,10 +12,10 @@ from time import time
 root_url = "http://localhost:8000"
 # root_url = "http://lunchtime.cqqqwq.com:8000"
 # Create your views here.
-def index(request):
+def index(request: HttpRequest):
     return HttpResponse("Hello, world. You're at the LunchTime index.")
 
-def register_without_verification(request):
+def register_without_verification(request: HttpRequest):
     res = {}
     if request.method != 'POST':
         res['status'] = False
@@ -48,7 +48,7 @@ def register_without_verification(request):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def verify_email(request):
+def verify_email(request: HttpRequest):
     res = {}
     if request.method != 'POST':
         res['status'] = False
@@ -75,7 +75,7 @@ def verify_email(request):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def register(request):
+def register(request: HttpRequest):
     res = {}
     if request.method != 'POST':
         res['status'] = False
@@ -121,7 +121,7 @@ def register(request):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def login(request):
+def login(request: HttpRequest):
     res = {}
     if request.method != 'POST':
         res['status'] = False
@@ -152,15 +152,15 @@ def login(request):
     return JsonResponse(res)
 
 @api_view(['GET'])
-def getPosts(request):
+def getPosts(request: HttpRequest):
     res = {}
     if request.method != "GET":
         res['status'] = False
         res['message'] = 'false method'
         return JsonResponse(res)
     try:
-        user_name = request.POST.get('user_name')
-        type = request.POST.get('type')
+        user_name = request.GET.get('user_name')
+        type = request.GET.get('type')
         # get user id
         query = User.objects.filter(name=user_name)
         if not query:
@@ -223,15 +223,15 @@ def getPosts(request):
 
 
 @api_view(['GET'])
-def getPostDetail(request):
+def getPostDetail(request : HttpRequest):
     res = {}
     if request.method != "GET":
         res['status'] = False
         res['message'] = 'false method'
         return JsonResponse(res)
     try:
-        user_name = request.POST.get('user_name')
-        post_id = request.POST.get('post_id')
+        user_name = request.GET.get('user_name')
+        post_id = request.GET.get('post_id')
         # get user id
         query = User.objects.filter(name=user_name)
         user_id = query.first().id
@@ -299,7 +299,7 @@ def getPostDetail(request):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def post(request):
+def post(request: HttpRequest):
     res = {}
     if request.method != "POST":
         res['status'] = False
@@ -357,7 +357,7 @@ def post(request):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def lovePost(request):
+def lovePost(request: HttpRequest):
     res = {}
     if request.method != "POST":
         res['status'] = False
@@ -409,7 +409,7 @@ def lovePost(request):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def commentPost(request):
+def commentPost(request: HttpRequest):
     res = {}
     if request.method != "POST":
         res['status'] = False
@@ -503,7 +503,7 @@ def savePost(request):
     return JsonResponse(res)
 
 @api_view(['GET'])
-def getNoticeLove(request):
+def getNoticeLove(request: HttpRequest):
     res = {}
     if request.method != "GET":
         res['status'] = False
@@ -511,7 +511,7 @@ def getNoticeLove(request):
         return JsonResponse(res)
     try:
         # get parameters
-        user_name = request.POST.get('user_name')
+        user_name = request.GET.get('user_name')
         # check if user exists
         query = User.objects.filter(name=user_name)
         if not query:
@@ -543,7 +543,7 @@ def getNoticeLove(request):
     return JsonResponse(res)
 
 @api_view(['GET'])
-def getNoticeComment(request):
+def getNoticeComment(request: HttpRequest):
     res = {}
     if request.method != "GET":
         res['status'] = False
@@ -551,7 +551,7 @@ def getNoticeComment(request):
         return JsonResponse(res)
     try:
         # get parameters
-        user_name = request.POST.get('user_name')
+        user_name = request.GET.get('user_name')
         # check if user exists
         query = User.objects.filter(name=user_name)
         if not query:
