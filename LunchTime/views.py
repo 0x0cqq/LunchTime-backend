@@ -6,6 +6,7 @@ from LunchTime.utils import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
+import os
 from time import time
 
 root_url = "http://localhost:8000"
@@ -176,7 +177,7 @@ def getPosts(request):
             post_user_name = query.first().name
             tmp['post_id'] = post.post_id
             tmp['user_name'] = post_user_name
-            tmp['create_time'] = post.create_time
+            tmp['create_time'] = post.create_time.timestamp().__floor__()
             tmp['tag'] = post.tag
             tmp['title'] = post.title
             tmp['content'] = post.content
@@ -250,7 +251,7 @@ def getPostDetail(request):
         post_user_name = query.first().name
         tmp['user_name'] = post_user_name
         tmp['post_id'] = post.post_id
-        tmp['create_time'] = post.create_time
+        tmp['create_time'] = post.create_time.timestamp().__floor__()
         tmp['tag'] = post.tag
         tmp['title'] = post.title
         tmp['content'] = post.content
@@ -284,7 +285,7 @@ def getPostDetail(request):
             query = User.objects.filter(id=q.user_id)
             tmp['user_name'] = query.first().name
             tmp['content'] = q.comment
-            tmp['create_time'] = str(q.create_time)
+            tmp['create_time'] = q.create_time.timestamp().__floor__()
             comments.append(tmp)
         # sorted by create_time
         # sorted_comments = sorted(comments, key=lambda x: x["create_time"], reverse=False)
@@ -331,8 +332,11 @@ def post(request):
         print("files:", files)
         for index, file in enumerate(files):
             print("file:", file)
+            file_dir = './media/postImage/'
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
             file_name =  str(int(time())) + "_" + str(index) + '.' + file.name.split('.')[-1]
-            file_path = './media/postImage/' + file_name
+            file_path = file_dir + file_name
             if file.name.split('.')[-1] not in ['jpeg','jpg','png']:
                 res['status'] = False
                 res['message'] = 'file error'
@@ -527,7 +531,7 @@ def getNoticeLove(request):
             tmp = {}
             tmp['post_id'] = item.post_id
             tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
-            tmp['create_time'] = item.create_time
+            tmp['create_time'] = item.create_time.timestamp().__floor__()
             loveList.append(tmp)
         res['loveList'] = loveList
         res['status'] = True
@@ -567,7 +571,7 @@ def getNoticeComment(request):
             tmp = {}
             tmp['post_id'] = item.post_id
             tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
-            tmp['create_time'] = item.create_time
+            tmp['create_time'] = item.create_time.timestamp().__floor__()
             tmp['content'] = item.comment
             commentList.append(tmp)
         res['commentList'] = commentList
