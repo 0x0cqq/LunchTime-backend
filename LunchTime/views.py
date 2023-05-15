@@ -270,12 +270,12 @@ def getPostDetail(request):
             tmp['is_saved'] = True
         else:
             tmp['is_saved'] = False
-        res['post'] = tmp
         # add picture list
-        res['picture'] = []
+        tmp['picture'] = []
         queries = PostPicture.objects.filter(post_id=post_id)
         for q in queries:
-            res['picture'].append(root_url + "/media/postImage/" + q.url)
+            tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+        res['post'] = tmp
         # add comment list
         comments = []
         queries = PostComment.objects.filter(post_id=post_id)
