@@ -17,6 +17,5 @@ urlpatterns = [
     path("save_post", views.savePost, name="save_post"),
     path("comment_post", views.commentPost, name="comment_post"),
 
-    path("notice_love", views.getNoticeLove, name="get_notice_love"),
-    path("notice_comment", views.getNoticeComment, name="get_notice_comment"),
+    path("notice", views.getNotice, name="get_notice"),
 ]

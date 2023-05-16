@@ -204,9 +204,9 @@ def getPosts(request: HttpRequest):
             for q in queries:
                 tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
-        if type == 1:
+        if type == "1":
             sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
-        elif type == 2:
+        elif type == "2":
             sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
         else:
             sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
@@ -503,7 +503,7 @@ def savePost(request):
     return JsonResponse(res)
 
 @api_view(['GET'])
-def getNoticeLove(request: HttpRequest):
+def getNotice(request: HttpRequest):
     res = {}
     if request.method != "GET":
         res['status'] = False
@@ -512,6 +512,7 @@ def getNoticeLove(request: HttpRequest):
     try:
         # get parameters
         user_name = request.GET.get('user_name')
+        qeury_type = request.GET.get('type')
         # check if user exists
         query = User.objects.filter(name=user_name)
         if not query:
@@ -524,57 +525,35 @@ def getNoticeLove(request: HttpRequest):
         post_ids = []
         for item in query:
             post_ids.append(item.post_id)
-        # get user's love list
-        loveList = []
-        query = PostLove.objects.filter(post_id__in=post_ids)
-        for item in query:
-            tmp = {}
-            tmp['post_id'] = item.post_id
-            tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
-            tmp['create_time'] = item.create_time.timestamp().__floor__()
-            loveList.append(tmp)
-        res['notice_list'] = loveList
-        res['status'] = True
-        res['message'] = 'ok'
-    except Exception as e:
-        print(e)
-        res['status'] = False
-        res['message'] = 'unexpected parameters'
-    return JsonResponse(res)
-
-@api_view(['GET'])
-def getNoticeComment(request: HttpRequest):
-    res = {}
-    if request.method != "GET":
-        res['status'] = False
-        res['message'] = 'false method'
-        return JsonResponse(res)
-    try:
-        # get parameters
-        user_name = request.GET.get('user_name')
-        # check if user exists
-        query = User.objects.filter(name=user_name)
-        if not query:
-            res['status'] = False
-            res['message'] = 'user does not exist'
-            return JsonResponse(res)
-        user_id = query.first().id
-        # get user's post list
-        query = Post.objects.filter(user_id=user_id)
-        post_ids = []
-        for item in query:
-            post_ids.append(item.post_id)
-        # get user's comment list
-        commentList = []
-        query = PostComment.objects.filter(post_id__in=post_ids)
-        for item in query:
-            tmp = {}
-            tmp['post_id'] = item.post_id
-            tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
-            tmp['create_time'] = item.create_time.timestamp().__floor__()
-            tmp['content'] = item.comment
-            commentList.append(tmp)
-        res['notice_list'] = commentList
+        # get user's comment/love/chat list
+        noticeList = []
+        if qeury_type == "1":
+            query = PostComment.objects.filter(post_id__in=post_ids)
+            for item in query:
+                tmp = {}
+                tmp['post_id'] = item.post_id
+                tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
+                tmp['create_time'] = item.create_time.timestamp().__floor__()
+                tmp['content'] = item.comment
+                q = PostPicture.objects.filter(post_id=item.post_id)
+                if q:
+                    tmp['picture'] = q.first().picture
+                else:   
+                    tmp['picture'] = ""
+                noticeList.append(tmp)
+        elif qeury_type == "2":
+            query = PostLove.objects.filter(post_id__in=post_ids)
+            for item in query:
+                tmp = {}
+                tmp['post_id'] = item.post_id
+                tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
+                tmp['create_time'] = item.create_time.timestamp().__floor__()
+                tmp['content'] = ""
+                tmp['picture'] = ""
+                noticeList.append(tmp)
+        else:
+            pass
+        res['notice_list'] = noticeList
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
