@@ -160,7 +160,7 @@ def getPosts(request: HttpRequest):
         return JsonResponse(res)
     try:
         user_name = request.GET.get('user_name')
-        type = request.GET.get('type')
+        type = int(request.GET.get('type'))
         # get user id
         query = User.objects.filter(name=user_name)
         if not query:
@@ -204,9 +204,9 @@ def getPosts(request: HttpRequest):
             for q in queries:
                 tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
-        if type == "1":
+        if type == 1:
             sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
-        elif type == "2":
+        elif type == 2:
             sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
         else:
             sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
@@ -231,7 +231,7 @@ def getPostDetail(request : HttpRequest):
         return JsonResponse(res)
     try:
         user_name = request.GET.get('user_name')
-        post_id = request.GET.get('post_id')
+        post_id = int(request.GET.get('post_id'))
         # get user id
         query = User.objects.filter(name=user_name)
         user_id = query.first().id
@@ -512,7 +512,7 @@ def getNotice(request: HttpRequest):
     try:
         # get parameters
         user_name = request.GET.get('user_name')
-        qeury_type = request.GET.get('type')
+        qeury_type = int(request.GET.get('type'))
         # check if user exists
         query = User.objects.filter(name=user_name)
         if not query:
@@ -527,7 +527,7 @@ def getNotice(request: HttpRequest):
             post_ids.append(item.post_id)
         # get user's comment/love/chat list
         noticeList = []
-        if qeury_type == "1":
+        if qeury_type == 1:
             query = PostComment.objects.filter(post_id__in=post_ids)
             for item in query:
                 tmp = {}
@@ -541,7 +541,7 @@ def getNotice(request: HttpRequest):
                 else:   
                     tmp['picture'] = ""
                 noticeList.append(tmp)
-        elif qeury_type == "2":
+        elif qeury_type == 2:
             query = PostLove.objects.filter(post_id__in=post_ids)
             for item in query:
                 tmp = {}

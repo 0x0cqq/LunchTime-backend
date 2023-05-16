@@ -1,5 +1,6 @@
 # API文档
-- 参数以表单形式从前端发送
+- POST 请求参数以表单形式从前端发送
+- GET 请求参数以Params形式从前端发送
 
 ## 一、登录相关
 
@@ -209,12 +210,13 @@
 ```
 
 ## 三、通知相关
-### 获取评论通知列表
-- GET: api/notice_comment
+### 获取评论/点赞/聊天通知列表
+- GET: api/notice
 - Param:
 ```json
 {
     "user_name":,
+    "type":, // 1->评论 2->点赞 3->聊天
 }
 ```
 - Response
@@ -225,8 +227,9 @@
             "user_name":,
             "user_image":, //用户头像，目前还不支持
             "create_time":,
-            "content":,
-            "post_id":, //评论的帖子id
+            "content":, //评论的内容
+            "post_id":, //帖子id
+            "picture":, //帖子的第一张图片
         },
     ],
     "status":,
@@ -234,26 +237,3 @@
 }
 ```
 
-### 获取赞通知列表
-- GET: api/notice_love
-- Param:
-```json
-{
-    "user_name":,
-}
-```
-- Response
-```json
-{
-    "notice_list":[
-        {
-            "user_name":,
-            "user_image":,
-            "create_time":,
-            "post_id":,
-        },
-    ],
-    "status":,
-    "message":,
-}
-```
