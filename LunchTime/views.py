@@ -205,12 +205,11 @@ def getPosts(request: HttpRequest):
                 tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
         if type == 0:
-            sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
+            sorted_posts = sorted(posts, key=lambda x: x["create_time"], reverse=True)
         elif type == 1:
             sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
         else:
-            sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
-            # TODO: filter by attention
+            sorted_posts = sorted(posts, key=lambda x: x["comment_count"], reverse=True)
         res['status'] = True
         res['message'] = 'ok'
         res['posts'] = sorted_posts
