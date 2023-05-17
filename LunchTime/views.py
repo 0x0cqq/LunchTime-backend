@@ -204,9 +204,9 @@ def getPosts(request: HttpRequest):
             for q in queries:
                 tmp['picture'].append(root_url + "/media/postImage/" + q.url)
             posts.append(tmp)
-        if type == 1:
+        if type == 0:
             sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
-        elif type == 2:
+        elif type == 1:
             sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
         else:
             sorted_posts = sorted(posts, key=lambda x: x["post_id"], reverse=True)
@@ -537,7 +537,7 @@ def getNotice(request: HttpRequest):
                 tmp['content'] = item.comment
                 q = PostPicture.objects.filter(post_id=item.post_id)
                 if q:
-                    tmp['picture'] = q.first().picture
+                    tmp['picture'] = root_url + "/media/postImage/" + q.first().url
                 else:   
                     tmp['picture'] = ""
                 noticeList.append(tmp)

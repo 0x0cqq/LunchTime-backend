@@ -69,7 +69,7 @@
 ```json
 {
     "user_name":,
-    "type":, // 1->time 2->popularity (TODO)3->attention
+    "type":, // 0->time 1->popularity (TODO)2->attention
 }
 ```
 - Response
