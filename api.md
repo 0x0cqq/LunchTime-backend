@@ -1,4 +1,5 @@
 # API文档
+
 - POST 请求参数以表单形式从前端发送
 - GET 请求参数以Params形式从前端发送
 
@@ -21,7 +22,9 @@
     "message": , //Error message
 }
 ```
+
 ### 用户注册
+
 - POST: /api/register
 - Param:
 
@@ -69,7 +72,8 @@
 ```json
 {
     "user_name":,
-    "type":, // 0->time 1->popularity (TODO)2->attention
+    "type": , // 0->time 1->popularity 2->comment
+    "target_user_name": , // empty means all users
 }
 ```
 - Response
@@ -125,7 +129,7 @@
         "is_loved":,
         "is_saved":,
     }, 
-    "comment":[{
+    "comments":[{
         "user_name": ,
         "content": ,
         "create_time":,},

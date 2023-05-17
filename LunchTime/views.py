@@ -161,6 +161,7 @@ def getPosts(request: HttpRequest):
     try:
         user_name = request.GET.get('user_name')
         type = int(request.GET.get('type'))
+        target_user_name = request.GET.get('target_user_name')
         # get user id
         query = User.objects.filter(name=user_name)
         if not query:
@@ -175,6 +176,8 @@ def getPosts(request: HttpRequest):
             tmp = {}
             query = User.objects.filter(id=post.user_id)
             post_user_name = query.first().name
+            if target_user_name and target_user_name != post_user_name:
+                continue
             tmp['post_id'] = post.post_id
             tmp['user_name'] = post_user_name
             tmp['create_time'] = post.create_time.timestamp().__floor__()
