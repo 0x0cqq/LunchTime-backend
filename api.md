@@ -66,13 +66,13 @@
 
 ## 二、帖子相关
 
-### 按时间线/热度/关注获取帖子
+### 按时间线/热度/评论/关注/收藏获取帖子
 - GET: api/posts
 - Param:
 ```json
 {
     "user_name":,
-    "type": , // 0->time 1->popularity 2->comment
+    "type": , // 0->time 1->popularity 2->comment 3->attention 4->save
     "target_user_name": , // empty means all users
 }
 ```
@@ -241,3 +241,155 @@
 }
 ```
 
+## 四、用户相关
+### 获取用户信息
+- GET: api/user_info
+- Param:
+```json
+{
+    "user_name":,
+    "target_user_name":,
+}
+```
+- Response:
+```json
+{
+    "user_image":,
+    "user_description":,
+    "follow_count":,
+    "fans_count":,
+    "is_following":,
+    "is_hating":,
+    "status":,
+    "message":,
+}
+```
+
+### 修改用户信息
+- POST: api/modify_user_info
+- Param:
+```json
+{
+    "original_user_name": ,
+    "new_user_name": ,
+    "new_user_description":,
+}
+```
+
+- Response
+```json
+{
+    "status":,
+    "message":,
+}
+```
+
+### 修改用户头像
+- POST: api/modify_user_image
+- Param:
+```json
+{
+    "user_name":,
+    "image":,
+}
+```
+- Response:
+```json
+{
+    "status":,
+    "message":,
+}
+```
+
+### 修改用户密码
+- POST: api/modify_user_password
+- Param:
+```json
+{
+    "user_name":,
+    "old_password":,
+    "new_password":,
+}
+```
+- Response:
+```json
+{
+    "status":,
+    "message":,
+}
+```
+
+### 关注/取消关注
+- POST: api/attention
+- Param:
+```json
+{
+    "user_name":,
+    "target_user_name":
+}
+```
+- Response
+```json
+{
+    "result":, //result=1, 关注成功; result=0, 取消关注成功
+    "status":,
+    "message":,
+}
+```
+
+### 拉黑/取消拉黑
+- POST: api/hate
+- Param:
+```json
+{
+    "user_name":,
+    "target_user_name":
+}
+```
+- Response
+```json
+{
+    "result":,
+    "status":,
+    "message":,
+}
+```
+
+### 获取关注/粉丝列表
+- GET: api/attention_list
+- Param:
+```json
+{
+    "user_name":,
+    "type":, //0->关注列表 1->粉丝列表
+}
+```
+- Response
+```json
+{
+    "user_list":[
+        {
+            "user_name":,
+            "user_image":,
+        },
+    ],
+    "status":,
+    "message":,
+}
+```
+
+### 获取黑名单列表
+- GET: api/hate_list
+- Param:
+```json
+{
+    "user_list":[
+        {
+            "user_name":,
+            "user_image":,
+        },
+    ],
+    "status":,
+    "message":,
+}
+```

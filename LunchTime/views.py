@@ -113,6 +113,8 @@ def register(request: HttpRequest):
         # add new user to database
         user = User(name=name, password=password, email=email)
         user.save()
+        userInfo = UserInfo(id=user.id, image='default.jpg', description='')
+        userInfo.save()
         res['status'] = True
         res['message'] = 'ok'
     except:
@@ -147,6 +149,66 @@ def login(request: HttpRequest):
         res['status'] = True    
         res['message'] = 'ok'
     except:
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['GET'])
+def getUserInfo(request: HttpRequest):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.GET.get('user_name')
+        target_user_name = request.GET.get('target_user_name')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # check if target user exists
+        query = User.objects.filter(name=target_user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'target user does not exist'
+            return JsonResponse(res)
+        target_user_id = query.first().id
+        # get user's info
+        query = UserInfo.objects.filter(id=target_user_id)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user info does not exist'
+            return JsonResponse(res)
+        user_info = query.first()
+        res['user_image'] = root_url + '/media/userImage/' + user_info.image
+        res['user_description'] = user_info.description
+        # get user's follow count
+        query = UserFollow.objects.filter(user_id=target_user_id)
+        res['follow_count'] = query.count()
+        # get user's fans count
+        query = UserFollow.objects.filter(follow_user_id=target_user_id)
+        res['fans_count'] = query.count()
+        # check if user follows target user
+        query = UserFollow.objects.filter(user_id=user_id, follow_user_id=target_user_id)
+        if query:
+            res['is_following'] = True
+        else:
+            res['is_following'] = False
+        # check if user hate target user
+        query = UserHate.objects.filter(user_id=user_id, hate_user_id=target_user_id)
+        if query:
+            res['is_hating'] = True
+        else:
+            res['is_hating'] = False
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
         res['status'] = False
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
@@ -331,9 +393,7 @@ def post(request: HttpRequest):
 
         # get picture list
         files = request.FILES.getlist('picture')
-        print("files:", files)
         for index, file in enumerate(files):
-            print("file:", file)
             file_dir = './media/postImage/'
             if not os.path.exists(file_dir):
                 os.makedirs(file_dir)
@@ -556,6 +616,296 @@ def getNotice(request: HttpRequest):
         else:
             pass
         res['notice_list'] = noticeList
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def followUser(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        target_user_name = request.POST.get('target_user_name')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # check if target user exists
+        query = User.objects.filter(name=target_user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'target user does not exist'
+            return JsonResponse(res)
+        target_user_id = query.first().id
+        # check if user has followed target user
+        query = UserFollow.objects.filter(user_id=user_id, follow_user_id=target_user_id)
+        if query:
+            # cancel follow
+            query.delete()
+            res['result'] = 0
+        else:
+            # add follow
+            follow = UserFollow(user_id=user_id, follow_user_id=target_user_id)
+            follow.save()
+            res['result'] = 1
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['GET'])
+def getAttentionList(request: HttpRequest):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.GET.get('user_name')
+        type = int(request.GET.get('type'))
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        userList = []
+        if type == 0:
+            # get user's follow list
+            query = UserFollow.objects.filter(user_id=user_id)
+            for item in query:
+                tmp = {}
+                target_user_id = item.follow_user_id
+                tmp['user_name'] = User.objects.filter(id=target_user_id).first().name
+                # get target user's image
+                tmp['user_image'] = root_url + '/media/userImage/' + UserInfo.objects.filter(id=target_user_id).first().image
+                userList.append(tmp)
+        elif type == 1:
+            # get user's fans list
+            query = UserFollow.objects.filter(follow_user_id=user_id)
+            for item in query:
+                tmp = {}
+                target_user_id = item.user_id
+                tmp['user_name'] = User.objects.filter(id=target_user_id).first().name
+                # get target user's image
+                tmp['user_image'] = root_url + '/media/userImage/' + UserInfo.objects.filter(id=target_user_id).first().image
+                userList.append(tmp)
+        res['user_list'] = userList
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def hateUser(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        target_user_name = request.POST.get('target_user_name')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # check if target user exists
+        query = User.objects.filter(name=target_user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'target user does not exist'
+            return JsonResponse(res)
+        target_user_id = query.first().id
+        # check if user has hated target user
+        query = UserHate.objects.filter(user_id=user_id, hate_user_id=target_user_id)
+        if query:
+            # cancel hate
+            query.delete()
+            res['result'] = 0
+        else:
+            # add hate
+            hate = UserHate(user_id=user_id, hate_user_id=target_user_id)
+            hate.save()
+            res['result'] = 1
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['GET'])
+def getHateList(request: HttpRequest):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.GET.get('user_name')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        userList = []
+        # get user's hate list
+        query = UserHate.objects.filter(user_id=user_id)
+        for item in query:
+            tmp = {}
+            target_user_id = item.hate_user_id
+            tmp['user_name'] = User.objects.filter(id=target_user_id).first().name
+            # get target user's image
+            tmp['user_image'] = root_url + '/media/userImage/' + UserInfo.objects.filter(id=target_user_id).first().image
+            userList.append(tmp)
+        res['user_list'] = userList
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def modifyUserInfo(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        origin_user_name = request.POST.get('original_user_name')
+        new_user_name = request.POST.get('new_user_name')
+        new_description = request.POST.get('new_user_description')
+        # check if user exists
+        query = User.objects.filter(name=origin_user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # modify user name
+        user = query.first()
+        user.name = new_user_name
+        user.save()
+        # modify user info
+        query = UserInfo.objects.filter(id=user_id)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user info does not exist'
+            return JsonResponse(res)
+        userInfo = query.first()
+        userInfo.description = new_description
+        userInfo.save()
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def modifyUserImage(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        file = request.FILES.get('image')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # find user info
+        query = UserInfo.objects.filter(id=user_id)
+        user_info = query.first()
+        if not query:
+            res['status'] = False
+            res['message'] = 'user info does not exist'
+            return JsonResponse(res)
+        # save image
+        file_dir = './media/userImage/'
+        if not os.path.exists(file_dir):
+            os.makedirs(file_dir)
+        file_name =  str(int(time())) + '.' + file.name.split('.')[-1]
+        file_path = file_dir + file_name
+        if file.name.split('.')[-1] not in ['jpeg','jpg','png']:
+            res['status'] = False
+            res['message'] = 'file error'
+            return JsonResponse(res)
+        with open(file_path,'wb+') as f:
+            f.write(file.read())
+        # add image to database
+        user_info.image = file_name
+        user_info.save()
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def modifyUserPassword(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        # check if user name match password
+        query = User.objects.filter(name=user_name, password=old_password)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user name does not match password'
+            return JsonResponse(res)
+        # modify password
+        user = query.first()
+        user.password = new_password
+        user.save()
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:

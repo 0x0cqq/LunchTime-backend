@@ -9,9 +9,13 @@ class User(models.Model):
     def __str__(self):
         return str(self.id) + " " + self.name
 
-class UserAttention(models.Model):
-    user_id = models.IntegerField()
-    attention_user_id = models.IntegerField()
+class UserInfo(models.Model):
+    id = models.IntegerField(primary_key=True)
+    image = models.CharField(max_length=200)
+    description = models.CharField(max_length=200)
+    def __str__(self):
+        return str(self.id)
+
 
 class VerifyEmail(models.Model):
     email = models.CharField(max_length=200, primary_key=True)
@@ -55,3 +59,15 @@ class PostComment(models.Model):
     user_id = models.IntegerField()
     create_time = models.DateTimeField(auto_now_add=True)
     comment = models.CharField(max_length=200)
+
+class UserFollow(models.Model):
+    user_id = models.IntegerField()
+    follow_user_id = models.IntegerField()
+    def __str__(self):
+        return "userId: " + str(self.user_id) + "  followUserId: " + str(self.follow_user_id)
+
+class UserHate(models.Model):
+    user_id = models.IntegerField()
+    hate_user_id = models.IntegerField()
+    def __str__(self):
+        return "userId: " + str(self.user_id) + "  hateUserId: " + str(self.hate_user_id)

@@ -8,6 +8,7 @@ urlpatterns = [
     path("verify_email", views.verify_email, name="verify_email"),
     path("register", views.register, name="register"),
     path("login", views.login, name="login"),
+    path("user_info", views.getUserInfo, name="get_user_info"),
 
     path("posts", views.getPosts, name="get_posts"),
     path("post_detail", views.getPostDetail, name="get_post_detail"),
@@ -18,4 +19,13 @@ urlpatterns = [
     path("comment_post", views.commentPost, name="comment_post"),
 
     path("notice", views.getNotice, name="get_notice"),
+
+    path("attention", views.followUser, name="attention"),
+    path("attention_list", views.getAttentionList, name="attention_list"),
+    path("hate", views.hateUser, name="hate"),
+    path("hate_list", views.getHateList, name="hate_list"),
+
+    path("modify_user_info", views.modifyUserInfo, name="modify_user_info"),
+    path("modify_user_image", views.modifyUserImage, name="modify_user_image"),
+    path("modify_user_password", views.modifyUserPassword, name="modify_user_password"),
 ]
