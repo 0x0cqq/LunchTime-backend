@@ -285,6 +285,128 @@ def getPosts(request: HttpRequest):
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
 
+@api_view(['GET'])
+def getPostsBySearch(request: HttpRequest):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.GET.get('user_name')
+        keyword = request.GET.get('keyword')
+        field = request.GET.get('field')
+        # get user id
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # split keyword to list
+        keywords = keyword.split()
+        # search posts
+        field_posts = []
+        if field == 'username':
+            # search by user name
+            for user in User.objects.all():
+                contains_all_keywords = all(keyword in user.name for keyword in keywords)
+                if contains_all_keywords:
+                    target_user_id = user.id
+                    objects = Post.objects.filter(user_id=target_user_id)
+                    for post in objects:
+                        field_posts.append(post)
+        elif field == 'title':
+            # 遍历所有的帖子对象
+            for post in Post.objects.all():
+                # 检查帖子是否包含keywords列表中所有元素
+                contains_all_keywords = all(keyword in post.title for keyword in keywords)
+                
+                # 如果帖子包含所有关键词，则将其添加到field_posts列表中
+                if contains_all_keywords:
+                    field_posts.append(post)
+        elif field == 'content':
+            # 遍历所有的帖子对象
+            for post in Post.objects.all():
+                # 检查帖子是否包含keywords列表中所有元素
+                contains_all_keywords = all(keyword in post.content for keyword in keywords)
+                
+                # 如果帖子包含所有关键词，则将其添加到field_posts列表中
+                if contains_all_keywords:
+                    field_posts.append(post)
+        elif field == 'tag':
+            # 遍历所有的帖子对象
+            for post in Post.objects.all():
+                # 检查帖子是否包含keywords列表中所有元素
+                contains_all_keywords = all(keyword in post.tag for keyword in keywords)
+                
+                # 如果帖子包含所有关键词，则将其添加到field_posts列表中
+                if contains_all_keywords:
+                    field_posts.append(post)
+        elif field == 'all':
+            # get user id
+            user_id_list = []
+            for user in User.objects.all():
+                contains_all_keywords = all(keyword in user.name for keyword in keywords)
+                if contains_all_keywords:
+                    target_user_id = user.id
+                    user_id_list.append(target_user_id)
+            # search all fields
+            for post in Post.objects.all():
+                flag_username = post.user_id in user_id_list
+                flag_title = all(keyword in post.title for keyword in keywords)
+                flag_tag = all(keyword in post.tag for keyword in keywords)
+                flag_content = all(keyword in post.content for keyword in keywords)
+                if flag_username or flag_title or flag_tag or flag_content:
+                    field_posts.append(post)
+        else:
+            res['status'] = False
+            res['message'] = 'wrong field'
+            return JsonResponse(res)
+        # generate response data
+        posts = []
+        for post in field_posts:
+            query = User.objects.filter(id=post.user_id)
+            post_user_name = query.first().name
+            tmp = {}
+            tmp['post_id'] = post.post_id
+            tmp['user_name'] = post_user_name
+            tmp['create_time'] = post.create_time.timestamp().__floor__()
+            tmp['tag'] = post.tag
+            tmp['title'] = post.title
+            tmp['content'] = post.content
+            tmp['location'] = post.location
+            tmp['love_count'] = post.love_count
+            tmp['comment_count'] = post.comment_count
+            tmp['save_count'] = post.save_count
+            tmp['picture'] = []
+            tmp['popularity'] = post.popularity
+            # check if user has loved this post
+            query = PostLove.objects.filter(post_id=post.post_id, user_id=user_id)
+            if query:
+                tmp['is_loved'] = True
+            else:
+                tmp['is_loved'] = False
+            # check if user has saved this post
+            query = PostSave.objects.filter(post_id=post.post_id, user_id=user_id)
+            if query:
+                tmp['is_saved'] = True
+            else:
+                tmp['is_saved'] = False
+            # get picture list
+            queries = PostPicture.objects.filter(post_id=post.post_id)
+            for q in queries:
+                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+            posts.append(tmp)
+        res['posts'] = posts
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
 
 @api_view(['GET'])
 def getPostDetail(request : HttpRequest):

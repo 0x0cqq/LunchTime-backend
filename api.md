@@ -100,6 +100,40 @@
 }
 ```
 
+### 搜索帖子
+- GET: api/search_post
+- Param:
+```json
+{
+    "user_name":,
+    "keyword":,
+    "field":, //'all', 'title', 'tag', 'content', 'username'
+}
+```
+- Response
+```json
+{
+    "status": ,
+    "message": ,
+    "posts":[{
+        "post_id": ,
+        "user_name": ,
+        "create_time":,
+        "tag":,
+        "title":,
+        "content":,
+        "picture":[] , //其中为图片的url链接
+        "location":,
+        "love_count":,
+        "comment_count":,
+        "save_count":,
+        "is_loved":,  //True or False
+        "is_saved":,
+        },
+    ]    
+}
+```
+
 ### 获取某个帖子的详细信息
 - GET: api/post_detail
 - Param:
