@@ -919,7 +919,7 @@ def getHateList(request: HttpRequest):
     return JsonResponse(res)
 
 @api_view(['POST'])
-def modifyUserInfo(request: HttpRequest):
+def modifyUserName(request: HttpRequest):
     res = {}
     if request.method != "POST":
         res['status'] = False
@@ -929,7 +929,6 @@ def modifyUserInfo(request: HttpRequest):
         # get parameters
         origin_user_name = request.POST.get('original_user_name')
         new_user_name = request.POST.get('new_user_name')
-        new_description = request.POST.get('new_user_description')
         # check if user exists
         query = User.objects.filter(name=origin_user_name)
         if not query:
@@ -941,6 +940,32 @@ def modifyUserInfo(request: HttpRequest):
         user = query.first()
         user.name = new_user_name
         user.save()
+        res['status'] = True
+        res['message'] = 'ok'
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def modifyUserDescription(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        new_description = request.POST.get('new_description')
+        # check if user exists
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
         # modify user info
         query = UserInfo.objects.filter(id=user_id)
         if not query:

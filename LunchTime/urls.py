@@ -26,7 +26,8 @@ urlpatterns = [
     path("hate", views.hateUser, name="hate"),
     path("hate_list", views.getHateList, name="hate_list"),
 
-    path("modify_user_info", views.modifyUserInfo, name="modify_user_info"),
+    path("modify_user_name", views.modifyUserName, name="modify_user_info"),
+    path("modify_user_description", views.modifyUserDescription, name="modify_user_description"),
     path("modify_user_image", views.modifyUserImage, name="modify_user_image"),
     path("modify_user_password", views.modifyUserPassword, name="modify_user_password"),
 ]

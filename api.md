@@ -299,13 +299,30 @@
 }
 ```
 
-### 修改用户信息
-- POST: api/modify_user_info
+### 修改用户名称
+- POST: api/modify_user_name
 - Param:
 ```json
 {
     "original_user_name": ,
     "new_user_name": ,
+}
+```
+
+- Response
+```json
+{
+    "status":,
+    "message":,
+}
+```
+
+### 修改用户简介
+- POST: api/modify_user_description
+- Param:
+```json
+{
+    "user_name": ,
     "new_user_description":,
 }
 ```
