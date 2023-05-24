@@ -84,6 +84,7 @@
     "posts":[{
         "post_id": ,
         "user_name": ,
+        "user_image": ,
         "create_time":,
         "tag":,
         "title":,
@@ -118,6 +119,7 @@
     "posts":[{
         "post_id": ,
         "user_name": ,
+        "user_image": ,
         "create_time":,
         "tag":,
         "title":,
@@ -151,6 +153,7 @@
     "post":{
         "post_id": ,
         "user_name": ,
+        "user_image": ,
         "create_time":,
         "tag":,
         "title":,

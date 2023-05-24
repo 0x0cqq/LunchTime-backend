@@ -244,6 +244,14 @@ def getPosts(request: HttpRequest):
                 continue
             tmp['post_id'] = post.post_id
             tmp['user_name'] = post_user_name
+            # get user's info
+            query = UserInfo.objects.filter(id=post.user_id)
+            if not query:
+                res['status'] = False
+                res['message'] = 'user info does not exist'
+                return JsonResponse(res)
+            user_info = query.first()
+            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
             tmp['create_time'] = post.create_time.timestamp().__floor__()
             tmp['tag'] = post.tag
             tmp['title'] = post.title
@@ -374,6 +382,14 @@ def getPostsBySearch(request: HttpRequest):
             tmp = {}
             tmp['post_id'] = post.post_id
             tmp['user_name'] = post_user_name
+            # get user's info
+            query = UserInfo.objects.filter(id=post.user_id)
+            if not query:
+                res['status'] = False
+                res['message'] = 'user info does not exist'
+                return JsonResponse(res)
+            user_info = query.first()
+            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
             tmp['create_time'] = post.create_time.timestamp().__floor__()
             tmp['tag'] = post.tag
             tmp['title'] = post.title
@@ -438,6 +454,14 @@ def getPostDetail(request : HttpRequest):
         query = User.objects.filter(id=post.user_id)
         post_user_name = query.first().name
         tmp['user_name'] = post_user_name
+        # get user's info
+        query = UserInfo.objects.filter(id=post.user_id)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user info does not exist'
+            return JsonResponse(res)
+        user_info = query.first()
+        tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
         tmp['post_id'] = post.post_id
         tmp['create_time'] = post.create_time.timestamp().__floor__()
         tmp['tag'] = post.tag
