@@ -782,7 +782,7 @@ def getNotice(request: HttpRequest):
                 user_info = query.first()
                 tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
-                tmp['content'] = item.comment
+                tmp['content'] = ""
                 q = PostPicture.objects.filter(post_id=item.post_id)
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = ""
@@ -790,7 +790,7 @@ def getNotice(request: HttpRequest):
                 noticeList.append(tmp)
         else:
             pass
-        res['notice_list'] = noticeList
+        res['notice_list'] = sorted(noticeList, key=lambda x: x['create_time'], reverse=True)
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
