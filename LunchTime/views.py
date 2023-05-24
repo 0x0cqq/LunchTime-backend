@@ -496,6 +496,14 @@ def getPostDetail(request : HttpRequest):
             tmp = {}
             query = User.objects.filter(id=q.user_id)
             tmp['user_name'] = query.first().name
+            # get user's info
+            query = UserInfo.objects.filter(id=q.user_id)
+            if not query:
+                res['status'] = False
+                res['message'] = 'user info does not exist'
+                return JsonResponse(res)
+            user_info = query.first()
+            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
             tmp['content'] = q.comment
             tmp['create_time'] = q.create_time.timestamp().__floor__()
             comments.append(tmp)
@@ -743,6 +751,14 @@ def getNotice(request: HttpRequest):
                 tmp = {}
                 tmp['post_id'] = item.post_id
                 tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
+                # get user's info
+                query = UserInfo.objects.filter(id=item.user_id)
+                if not query:
+                    res['status'] = False
+                    res['message'] = 'user info does not exist'
+                    return JsonResponse(res)
+                user_info = query.first()
+                tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = item.comment
                 q = PostPicture.objects.filter(post_id=item.post_id)
@@ -757,6 +773,17 @@ def getNotice(request: HttpRequest):
                 tmp = {}
                 tmp['post_id'] = item.post_id
                 tmp['user_name'] = User.objects.filter(id=item.user_id).first().name
+                # get user's info
+                query = UserInfo.objects.filter(id=item.user_id)
+                if not query:
+                    res['status'] = False
+                    res['message'] = 'user info does not exist'
+                    return JsonResponse(res)
+                user_info = query.first()
+                tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+                tmp['create_time'] = item.create_time.timestamp().__floor__()
+                tmp['content'] = item.comment
+                q = PostPicture.objects.filter(post_id=item.post_id)
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = ""
                 tmp['picture'] = ""

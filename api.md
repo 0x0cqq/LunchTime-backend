@@ -168,6 +168,7 @@
     }, 
     "comments":[{
         "user_name": ,
+        "user_image": ,
         "content": ,
         "create_time":,},
     ]
