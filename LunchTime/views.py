@@ -185,26 +185,28 @@ def getUserInfo(request: HttpRequest):
             res['message'] = 'user info does not exist'
             return JsonResponse(res)
         user_info = query.first()
-        res['user_image'] = root_url + '/media/userImage/' + user_info.image
-        res['user_description'] = user_info.description
+        res_user_info = {}
+        res_user_info['user_image'] = root_url + '/media/userImage/' + user_info.image
+        res_user_info['user_description'] = user_info.description
         # get user's follow count
         query = UserFollow.objects.filter(user_id=target_user_id)
-        res['follow_count'] = query.count()
+        res_user_info['follow_count'] = query.count()
         # get user's fans count
         query = UserFollow.objects.filter(follow_user_id=target_user_id)
-        res['fans_count'] = query.count()
+        res_user_info['fans_count'] = query.count()
         # check if user follows target user
         query = UserFollow.objects.filter(user_id=user_id, follow_user_id=target_user_id)
         if query:
-            res['is_following'] = True
+            res_user_info['is_following'] = True
         else:
-            res['is_following'] = False
+            res_user_info['is_following'] = False
         # check if user hate target user
         query = UserHate.objects.filter(user_id=user_id, hate_user_id=target_user_id)
         if query:
-            res['is_hating'] = True
+            res_user_info['is_hating'] = True
         else:
-            res['is_hating'] = False
+            res_user_info['is_hating'] = False
+        res['user_info'] = res_user_info
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:

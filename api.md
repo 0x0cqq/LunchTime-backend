@@ -287,13 +287,15 @@
 ```
 - Response:
 ```json
-{
-    "user_image":,
-    "user_description":,
-    "follow_count":,
-    "fans_count":,
-    "is_following":,
-    "is_hating":,
+{   
+    "user_info":{
+        "user_image":,
+        "user_description":,
+        "follow_count":,
+        "fans_count":,
+        "is_following":,
+        "is_hating":,
+    },
     "status":,
     "message":,
 }
