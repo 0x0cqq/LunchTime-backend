@@ -26,10 +26,10 @@ import LunchTime.routing
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": 
-        AllowedHostsOriginValidator(
+        # AllowedHostsOriginValidator(
             AuthMiddlewareStack(
             URLRouter(LunchTime.routing.websocket_urlpatterns)
-        )
+        # )
     )
     ,
 })
