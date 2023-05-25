@@ -24,7 +24,6 @@ urlpatterns = [
     path("attention", views.followUser, name="attention"),
     path("attention_list", views.getAttentionList, name="attention_list"),
     path("hate", views.hateUser, name="hate"),
-    path("hate_list", views.getHateList, name="hate_list"),
 
     path("modify_user_name", views.modifyUserName, name="modify_user_info"),
     path("modify_user_description", views.modifyUserDescription, name="modify_user_description"),

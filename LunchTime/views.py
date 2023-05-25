@@ -179,34 +179,7 @@ def getUserInfo(request: HttpRequest):
             return JsonResponse(res)
         target_user_id = query.first().id
         # get user's info
-        query = UserInfo.objects.filter(id=target_user_id)
-        if not query:
-            res['status'] = False
-            res['message'] = 'user info does not exist'
-            return JsonResponse(res)
-        user_info = query.first()
-        res_user_info = {}
-        res_user_info['user_image'] = root_url + '/media/userImage/' + user_info.image
-        res_user_info['user_description'] = user_info.description
-        # get user's follow count
-        query = UserFollow.objects.filter(user_id=target_user_id)
-        res_user_info['follow_count'] = query.count()
-        # get user's fans count
-        query = UserFollow.objects.filter(follow_user_id=target_user_id)
-        res_user_info['fans_count'] = query.count()
-        # check if user follows target user
-        query = UserFollow.objects.filter(user_id=user_id, follow_user_id=target_user_id)
-        if query:
-            res_user_info['is_following'] = True
-        else:
-            res_user_info['is_following'] = False
-        # check if user hate target user
-        query = UserHate.objects.filter(user_id=user_id, hate_user_id=target_user_id)
-        if query:
-            res_user_info['is_hating'] = True
-        else:
-            res_user_info['is_hating'] = False
-        res['user_info'] = res_user_info
+        res['user_info'] = getSingleUserInfo(user_id, target_user_id, root_url)
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
@@ -866,21 +839,22 @@ def getAttentionList(request: HttpRequest):
             # get user's follow list
             query = UserFollow.objects.filter(user_id=user_id)
             for item in query:
-                tmp = {}
                 target_user_id = item.follow_user_id
-                tmp['user_name'] = User.objects.filter(id=target_user_id).first().name
-                # get target user's image
-                tmp['user_image'] = root_url + '/media/userImage/' + UserInfo.objects.filter(id=target_user_id).first().image
+                tmp = getSingleUserInfo(user_id, target_user_id, root_url)
                 userList.append(tmp)
         elif type == 1:
             # get user's fans list
             query = UserFollow.objects.filter(follow_user_id=user_id)
             for item in query:
-                tmp = {}
                 target_user_id = item.user_id
-                tmp['user_name'] = User.objects.filter(id=target_user_id).first().name
-                # get target user's image
-                tmp['user_image'] = root_url + '/media/userImage/' + UserInfo.objects.filter(id=target_user_id).first().image
+                tmp = getSingleUserInfo(user_id, target_user_id, root_url)
+                userList.append(tmp)
+        elif type == 2:
+            # get user's hate list
+            query = UserHate.objects.filter(user_id=user_id)
+            for item in query:
+                target_user_id = item.hate_user_id
+                tmp = getSingleUserInfo(user_id, target_user_id, root_url)
                 userList.append(tmp)
         res['user_list'] = userList
         res['status'] = True
@@ -927,42 +901,6 @@ def hateUser(request: HttpRequest):
             hate = UserHate(user_id=user_id, hate_user_id=target_user_id)
             hate.save()
             res['result'] = 1
-        res['status'] = True
-        res['message'] = 'ok'
-    except Exception as e:
-        print(e)
-        res['status'] = False
-        res['message'] = 'unexpected parameters'
-    return JsonResponse(res)
-
-@api_view(['GET'])
-def getHateList(request: HttpRequest):
-    res = {}
-    if request.method != "GET":
-        res['status'] = False
-        res['message'] = 'false method'
-        return JsonResponse(res)
-    try:
-        # get parameters
-        user_name = request.GET.get('user_name')
-        # check if user exists
-        query = User.objects.filter(name=user_name)
-        if not query:
-            res['status'] = False
-            res['message'] = 'user does not exist'
-            return JsonResponse(res)
-        user_id = query.first().id
-        userList = []
-        # get user's hate list
-        query = UserHate.objects.filter(user_id=user_id)
-        for item in query:
-            tmp = {}
-            target_user_id = item.hate_user_id
-            tmp['user_name'] = User.objects.filter(id=target_user_id).first().name
-            # get target user's image
-            tmp['user_image'] = root_url + '/media/userImage/' + UserInfo.objects.filter(id=target_user_id).first().image
-            userList.append(tmp)
-        res['user_list'] = userList
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:

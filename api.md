@@ -412,13 +412,13 @@
 }
 ```
 
-### 获取关注/粉丝列表
+### 获取关注/粉丝/黑名单列表
 - GET: api/attention_list
 - Param:
 ```json
 {
     "user_name":,
-    "type":, //0->关注列表 1->粉丝列表
+    "type":, //0->关注列表 1->粉丝列表 2->黑名单列表
 }
 ```
 - Response
@@ -428,22 +428,11 @@
         {
             "user_name":,
             "user_image":,
-        },
-    ],
-    "status":,
-    "message":,
-}
-```
-
-### 获取黑名单列表
-- GET: api/hate_list
-- Param:
-```json
-{
-    "user_list":[
-        {
-            "user_name":,
-            "user_image":,
+            "user_description":,
+            "follow_cnt":,
+            "fans_cnt":,
+            "isFollowing":,
+            "isHating":,
         },
     ],
     "status":,
