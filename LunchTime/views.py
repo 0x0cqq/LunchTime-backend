@@ -256,8 +256,31 @@ def getPosts(request: HttpRequest):
             sorted_posts = sorted(posts, key=lambda x: x["create_time"], reverse=True)
         elif type == 1:
             sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
-        else:
+        elif type == 2:
             sorted_posts = sorted(posts, key=lambda x: x["comment_count"], reverse=True)
+        elif type == 3:
+            queries = UserFollow.objects.filter(user_id=user_id)
+            follow_list = []
+            for q in queries:
+                # get user's name
+                query = User.objects.filter(id=q.follow_user_id)
+                follow_list.append(query.first().name)
+            sorted_posts = []
+            for post in posts:
+                if post['user_name'] in follow_list:
+                    sorted_posts.append(post)
+        elif type == 4:
+            # get posts that user saved
+            queries = PostSave.objects.filter(user_id=user_id)
+            save_list = []
+            for q in queries:
+                save_list.append(q.post_id)
+            sorted_posts = []
+            for post in posts:
+                if post['post_id'] in save_list:
+                    sorted_posts.append(post)
+        else:
+            sorted_posts = posts
         res['status'] = True
         res['message'] = 'ok'
         res['posts'] = sorted_posts

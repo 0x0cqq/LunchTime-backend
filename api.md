@@ -293,6 +293,7 @@
 ```json
 {   
     "user_info":{
+        "user_name":,
         "user_image":,
         "user_description":,
         "follow_count":,
