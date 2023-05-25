@@ -18,6 +18,8 @@ from django.urls import path, include, re_path
 from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView, RedirectView, SpectacularJSONAPIView
 from django.views.static import serve
 from backend.settings import MEDIA_ROOT
+
+
 urlpatterns = [
     path('', RedirectView.as_view(url='docs')),
     path('swagger/json/', SpectacularJSONAPIView.as_view(), name='schema'),

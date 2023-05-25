@@ -71,3 +71,17 @@ class UserHate(models.Model):
     hate_user_id = models.IntegerField()
     def __str__(self):
         return "userId: " + str(self.user_id) + "  hateUserId: " + str(self.hate_user_id)
+
+   
+class ChatMessage(models.Model):
+    # sender_id and receiver_id are both user_id
+    # createtime is the time when the message is sent
+    # message is the content of the message
+    message_id = models.AutoField(primary_key=True) 
+    sender_id = models.IntegerField()
+    receiver_id = models.IntegerField()
+    create_time = models.DateTimeField()
+    message = models.CharField(max_length=2000)
+    def __str__(self):  
+        return "senderId: " + str(self.sender_id) + "  receiverId: " + str(self.receiver_id) + "  message: " + self.message
+    

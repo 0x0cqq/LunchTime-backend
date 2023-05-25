@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['82.156.30.206', 'lunchtime.cqqqwq.com', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'LunchTime.apps.LunchtimeConfig',
     'drf_spectacular',
     'drf_spectacular_sidecar',
@@ -71,8 +72,15 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "backend.asgi.application"
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+# Channels Layer
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
