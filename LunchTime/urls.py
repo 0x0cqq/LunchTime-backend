@@ -13,6 +13,7 @@ urlpatterns = [
     path("posts", views.getPosts, name="get_posts"),
     path("post_detail", views.getPostDetail, name="get_post_detail"),
     path("search_post", views.getPostsBySearch, name="search_post"),
+    path("posts_saved", views.getPostsSaved, name="get_posts_saved"),
 
     path("post", views.post, name="post"),
     path("love_post", views.lovePost, name="love_post"),

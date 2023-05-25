@@ -66,13 +66,13 @@
 
 ## 二、帖子相关
 
-### 按时间线/热度/评论/关注/收藏获取帖子
+### 按时间线/热度/评论/关注获取帖子
 - GET: api/posts
 - Param:
 ```json
 {
     "user_name":,
-    "type": , // 0->time 1->popularity 2->comment 3->attention 4->save
+    "type": , // 0->time 1->popularity 2->comment 3->attention
     "target_user_name": , // empty means all users
 }
 ```
@@ -100,6 +100,40 @@
     ]
 }
 ```
+### 获取用户收藏的帖子
+- GET: api/posts_saved
+- Param:
+```json
+{
+    "user_name":,
+    "target_user_name": , 
+}
+```
+- Response
+```json
+{
+    "status": ,
+    "message": ,
+    "posts":[{
+        "post_id": ,
+        "user_name": ,
+        "user_image": ,
+        "create_time":,
+        "tag":,
+        "title":,
+        "content":,
+        "picture":[] , //其中为图片的url链接
+        "location":,
+        "love_count":,
+        "comment_count":,
+        "save_count":,
+        "is_loved":,  //True or False
+        "is_saved":,
+        },
+    ]
+}
+```
+
 
 ### 搜索帖子
 - GET: api/search_post

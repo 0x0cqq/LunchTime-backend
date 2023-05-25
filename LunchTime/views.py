@@ -269,16 +269,6 @@ def getPosts(request: HttpRequest):
             for post in posts:
                 if post['user_name'] in follow_list:
                     sorted_posts.append(post)
-        elif type == 4:
-            # get posts that user saved
-            queries = PostSave.objects.filter(user_id=user_id)
-            save_list = []
-            for q in queries:
-                save_list.append(q.post_id)
-            sorted_posts = []
-            for post in posts:
-                if post['post_id'] in save_list:
-                    sorted_posts.append(post)
         else:
             sorted_posts = posts
         res['status'] = True
@@ -290,6 +280,90 @@ def getPosts(request: HttpRequest):
         res['status'] = False
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
+
+@api_view(['GET'])
+def getPostsSaved(request: HttpRequest):
+    res = {}
+    if request.method != "GET":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        user_name = request.GET.get('user_name')
+        target_user_name = request.GET.get('target_user_name')
+        # get user id
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # get target user id
+        query = User.objects.filter(name=target_user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'target user does not exist'
+            return JsonResponse(res)
+        target_user_id = query.first().id
+        # get posts target user saved
+        objects = PostSave.objects.filter(user_id=target_user_id)
+        objects = sorted(objects, key=lambda x: x.create_time, reverse=True)
+        post_ids = []
+        for object in objects:
+            post_ids.append(object.post_id)
+        posts_queries = Post.objects.filter(post_id__in=post_ids)
+        posts = []
+        for post in posts_queries:
+            tmp = {}
+            query = User.objects.filter(id=post.user_id)
+            post_user_name = query.first().name
+            tmp['post_id'] = post.post_id
+            tmp['user_name'] = post_user_name
+            # get user's info
+            query = UserInfo.objects.filter(id=post.user_id)
+            if not query:
+                res['status'] = False
+                res['message'] = 'user info does not exist'
+                return JsonResponse(res)
+            user_info = query.first()
+            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+            tmp['create_time'] = post.create_time.timestamp().__floor__()
+            tmp['tag'] = post.tag
+            tmp['title'] = post.title
+            tmp['content'] = post.content
+            tmp['location'] = post.location
+            tmp['love_count'] = post.love_count
+            tmp['comment_count'] = post.comment_count
+            tmp['save_count'] = post.save_count
+            tmp['picture'] = []
+            tmp['popularity'] = post.popularity
+            # check if user has loved this post
+            query = PostLove.objects.filter(post_id=post.post_id, user_id=user_id)
+            if query:
+                tmp['is_loved'] = True
+            else:
+                tmp['is_loved'] = False
+            # check if user has saved this post
+            query = PostSave.objects.filter(post_id=post.post_id, user_id=user_id)
+            if query:
+                tmp['is_saved'] = True
+            else:
+                tmp['is_saved'] = False
+            # get picture list
+            queries = PostPicture.objects.filter(post_id=post.post_id)
+            for q in queries:
+                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+            posts.append(tmp)
+        res['status'] = True
+        res['message'] = 'ok'
+        res['posts'] = posts
+
+    except Exception as e:
+        print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
 
 @api_view(['GET'])
 def getPostsBySearch(request: HttpRequest):
