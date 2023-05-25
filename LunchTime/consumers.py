@@ -47,7 +47,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message = text_data_json["message"]
             content = message["message"]
             # timestamp is in milliseconds
-            time = datetime.time()
+            time = datetime.now()
 
             # insert the message into the database
 
@@ -70,11 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ))
         elif text_data_json["type"] == "history":
             chat_list = await self.get_history(self.send_user_id, self.receive_user_id)
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        "type": "history",
-                        "history": [
+            chat_list = [
                             {
                                 "sender_id": chat.sender_id,
                                 "message": chat.message,
@@ -82,6 +78,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             }
                             for chat in chat_list
                         ]
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "type": "history",
+                        "history": chat_list 
                     }
                 )
             )
