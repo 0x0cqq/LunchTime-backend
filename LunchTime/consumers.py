@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 
 import channels.layers
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import User, ChatMessage
@@ -29,6 +29,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def insert_message(self, chat_message: ChatMessage):
         chat_message.save()
+
+    @sync_to_async
+    def transform_chat_to_json(self, chat_list):
+        return [
+            {
+                "sender_id": chat.sender_id,
+                "message": chat.message,
+                "timestamp": chat.create_time.timestamp().__floor__(),
+            }
+            for chat in chat_list
+        ]
 
     @database_sync_to_async
     def get_history(self, sender_id, receiver_id):
@@ -70,14 +81,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ))
         elif text_data_json["type"] == "history":
             chat_list = await self.get_history(self.send_user_id, self.receive_user_id)
-            chat_list = [
-                            {
-                                "sender_id": chat.sender_id,
-                                "message": chat.message,
-                                "timestamp": chat.create_time.timestamp().__floor__(),
-                            }
-                            for chat in chat_list
-                        ]
+            chat_list = await self.transform_chat_to_json(chat_list)
             await self.send(
                 text_data=json.dumps(
                     {
