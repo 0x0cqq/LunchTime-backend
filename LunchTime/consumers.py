@@ -49,7 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return ChatMessage.objects.filter(
             sender_id__in=[sender_id, receiver_id],
             receiver_id__in=[sender_id, receiver_id],
-        ).order_by("create_time")
+        ).order_by("-create_time")
     
 
     async def receive(self, text_data):
