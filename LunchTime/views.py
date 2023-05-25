@@ -994,6 +994,11 @@ def hateUser(request: HttpRequest):
             query.delete()
             res['result'] = 0
         else:
+            # check if user has followed target user
+            query = UserFollow.objects.filter(user_id=user_id, follow_user_id=target_user_id)
+            if query:
+                # cancel follow
+                query.delete()
             # add hate
             hate = UserHate(user_id=user_id, hate_user_id=target_user_id)
             hate.save()
