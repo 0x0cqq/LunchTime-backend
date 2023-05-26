@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from django.http import HttpRequest, JsonResponse
 from ..models import ChatMessage, User, UserInfo
 
+from backend.settings import ROOT_URL, MEDIA_URL
+
 # Persons chat with someone
 class ChatListView(APIView):
     # Input: person username (str)
@@ -42,7 +44,7 @@ class ChatListView(APIView):
             'status': True,
             'chat_list': [ {
                 'user_name': persons_user_name[i],
-                'user_avatar': persons_user_image[i],
+                'user_avatar': ROOT_URL + MEDIA_URL + "userImage/" + persons_user_image[i],
                 'content': messages[i],
                 'timestamp': timestamp[i]
             } for i in range(len(persons))

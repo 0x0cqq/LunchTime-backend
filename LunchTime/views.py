@@ -9,8 +9,9 @@ from drf_spectacular.utils import extend_schema
 import os
 from time import time
 
-root_url = "http://localhost:8000"
-# root_url = "http://lunchtime.cqqqwq.com:8000"
+from backend.settings import ROOT_URL, MEDIA_URL
+
+# ROOT_URL = "http://lunchtime.cqqqwq.com:8000"
 # Create your views here.
 def index(request: HttpRequest):
     return HttpResponse("Hello, world. You're at the LunchTime index.")
@@ -179,7 +180,7 @@ def getUserInfo(request: HttpRequest):
             return JsonResponse(res)
         target_user_id = query.first().id
         # get user's info
-        res['user_info'] = getSingleUserInfo(user_id, target_user_id, root_url)
+        res['user_info'] = getSingleUserInfo(user_id, target_user_id, ROOT_URL)
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
@@ -231,7 +232,7 @@ def getPosts(request: HttpRequest):
                 res['message'] = 'user info does not exist'
                 return JsonResponse(res)
             user_info = query.first()
-            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+            tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
             tmp['create_time'] = post.create_time.timestamp().__floor__()
             tmp['tag'] = post.tag
             tmp['title'] = post.title
@@ -257,7 +258,7 @@ def getPosts(request: HttpRequest):
             # get picture list
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
-                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+                tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
             posts.append(tmp)
         if type == 0:
             sorted_posts = sorted(posts, key=lambda x: x["create_time"], reverse=True)
@@ -333,7 +334,7 @@ def getPostsSaved(request: HttpRequest):
                 res['message'] = 'user info does not exist'
                 return JsonResponse(res)
             user_info = query.first()
-            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+            tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
             tmp['create_time'] = post.create_time.timestamp().__floor__()
             tmp['tag'] = post.tag
             tmp['title'] = post.title
@@ -359,7 +360,7 @@ def getPostsSaved(request: HttpRequest):
             # get picture list
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
-                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+                tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
             posts.append(tmp)
         res['status'] = True
         res['message'] = 'ok'
@@ -473,7 +474,7 @@ def getPostsBySearch(request: HttpRequest):
                 res['message'] = 'user info does not exist'
                 return JsonResponse(res)
             user_info = query.first()
-            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+            tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
             tmp['create_time'] = post.create_time.timestamp().__floor__()
             tmp['tag'] = post.tag
             tmp['title'] = post.title
@@ -499,7 +500,7 @@ def getPostsBySearch(request: HttpRequest):
             # get picture list
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
-                tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+                tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
             posts.append(tmp)
         res['posts'] = posts
         res['status'] = True
@@ -545,7 +546,7 @@ def getPostDetail(request : HttpRequest):
             res['message'] = 'user info does not exist'
             return JsonResponse(res)
         user_info = query.first()
-        tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+        tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
         tmp['post_id'] = post.post_id
         tmp['create_time'] = post.create_time.timestamp().__floor__()
         tmp['tag'] = post.tag
@@ -571,7 +572,7 @@ def getPostDetail(request : HttpRequest):
         tmp['picture'] = []
         queries = PostPicture.objects.filter(post_id=post_id)
         for q in queries:
-            tmp['picture'].append(root_url + "/media/postImage/" + q.url)
+            tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
         res['post'] = tmp
         # add comment list
         comments = []
@@ -587,7 +588,7 @@ def getPostDetail(request : HttpRequest):
                 res['message'] = 'user info does not exist'
                 return JsonResponse(res)
             user_info = query.first()
-            tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+            tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
             tmp['content'] = q.comment
             tmp['create_time'] = q.create_time.timestamp().__floor__()
             comments.append(tmp)
@@ -842,12 +843,12 @@ def getNotice(request: HttpRequest):
                     res['message'] = 'user info does not exist'
                     return JsonResponse(res)
                 user_info = query.first()
-                tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+                tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = item.comment
                 q = PostPicture.objects.filter(post_id=item.post_id)
                 if q:
-                    tmp['picture'] = root_url + "/media/postImage/" + q.first().url
+                    tmp['picture'] = ROOT_URL + MEDIA_URL + "postImage/" + q.first().url
                 else:   
                     tmp['picture'] = ""
                 noticeList.append(tmp)
@@ -864,7 +865,7 @@ def getNotice(request: HttpRequest):
                     res['message'] = 'user info does not exist'
                     return JsonResponse(res)
                 user_info = query.first()
-                tmp['user_image'] = root_url + '/media/userImage/' + user_info.image
+                tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = ""
                 q = PostPicture.objects.filter(post_id=item.post_id)
@@ -951,21 +952,21 @@ def getAttentionList(request: HttpRequest):
             query = UserFollow.objects.filter(user_id=user_id)
             for item in query:
                 target_user_id = item.follow_user_id
-                tmp = getSingleUserInfo(user_id, target_user_id, root_url)
+                tmp = getSingleUserInfo(user_id, target_user_id, ROOT_URL)
                 userList.append(tmp)
         elif type == 1:
             # get user's fans list
             query = UserFollow.objects.filter(follow_user_id=user_id)
             for item in query:
                 target_user_id = item.user_id
-                tmp = getSingleUserInfo(user_id, target_user_id, root_url)
+                tmp = getSingleUserInfo(user_id, target_user_id, ROOT_URL)
                 userList.append(tmp)
         elif type == 2:
             # get user's hate list
             query = UserHate.objects.filter(user_id=user_id)
             for item in query:
                 target_user_id = item.hate_user_id
-                tmp = getSingleUserInfo(user_id, target_user_id, root_url)
+                tmp = getSingleUserInfo(user_id, target_user_id, ROOT_URL)
                 userList.append(tmp)
         res['user_list'] = userList
         res['status'] = True

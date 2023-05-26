@@ -9,6 +9,7 @@ from .models import User, ChatMessage, UserInfo
 from urllib.parse import parse_qsl
 from typing import *
 
+from backend.settings import MEDIA_URL, ROOT_URL
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -92,8 +93,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             result.append(
                 {
                     "user_name": sender_name,
-                    "user_avatar": sender_image,
-                    "message": chat.message,
+                    "user_avatar": ROOT_URL + MEDIA_URL + "userImage/" + sender_image,
+                    "content": chat.message,
                     "timestamp": chat.create_time.timestamp().__floor__(),
                 }
             )                
@@ -169,7 +170,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "type": "message",
                         "message": {
                             "user_name": sender_name,
-                            "avatar": sender_image,
+                            "avatar": ROOT_URL + MEDIA_URL + "userImage/" + sender_image,
                             "content": content,
                             "timestamp": timestamp,
                         }

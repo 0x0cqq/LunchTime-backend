@@ -27,6 +27,9 @@ SECRET_KEY = 'django-insecure-v1t$a1igu!1q1_l-kjd!!-w%v*y-0)@d@)@uq-6!b6bhknp+&2
 DEBUG = True
 
 ALLOWED_HOSTS = ['82.156.30.206', 'lunchtime.cqqqwq.com', 'localhost']
+ROOT_URL = "http://82.156.30.206:8000"
+WS_ROOT_URL = "ws://82.156.30.206:8000"
+
 
 
 # Application definition
