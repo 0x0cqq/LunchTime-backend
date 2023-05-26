@@ -206,6 +206,11 @@ def getPosts(request: HttpRequest):
             res['message'] = 'user does not exist'
             return JsonResponse(res)
         user_id = query.first().id
+        # get user's hate list
+        query = UserHate.objects.filter(user_id=user_id)
+        hate_user_id_list = []
+        for item in query:
+            hate_user_id_list.append(item.hate_user_id)
         # get all posts
         objects = Post.objects.all()
         posts = []
@@ -214,6 +219,8 @@ def getPosts(request: HttpRequest):
             query = User.objects.filter(id=post.user_id)
             post_user_name = query.first().name
             if target_user_name and target_user_name != post_user_name:
+                continue
+            if post.user_id in hate_user_id_list and target_user_name is None:
                 continue
             tmp['post_id'] = post.post_id
             tmp['user_name'] = post_user_name
@@ -384,6 +391,11 @@ def getPostsBySearch(request: HttpRequest):
             res['message'] = 'user does not exist'
             return JsonResponse(res)
         user_id = query.first().id
+        # get user's hate list
+        query = UserHate.objects.filter(user_id=user_id)
+        hate_user_id_list = []
+        for item in query:
+            hate_user_id_list.append(item.hate_user_id)
         # split keyword to list
         keywords = keyword.split()
         # search posts
@@ -447,6 +459,8 @@ def getPostsBySearch(request: HttpRequest):
         # generate response data
         posts = []
         for post in field_posts:
+            if post.user_id in hate_user_id_list:
+                continue
             query = User.objects.filter(id=post.user_id)
             post_user_name = query.first().name
             tmp = {}
