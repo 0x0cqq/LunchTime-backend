@@ -108,7 +108,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         chat_list = ChatMessage.objects.filter(
             sender_id__in=[sender_id, receiver_id],
             receiver_id__in=[sender_id, receiver_id],
-        ).order_by("create_time")
+        ).order_by("-create_time")
         return chat_list
     
 
