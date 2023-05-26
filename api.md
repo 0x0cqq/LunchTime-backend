@@ -474,3 +474,31 @@
     "message":,
 }
 ```
+
+## 五、聊天相关
+
+### 聊天列表 (/api/chat)
+
+#### GET
+
+* Params:
+    * `user_name`: 用户名
+* Response:
+
+```json
+{
+    "status": "ok" | "error",
+    "message": "错误信息" | null,
+    "chat_list": [{
+        "user_name" : "用户名",
+        "user_image": "头像 URL" ,
+        "message": "最近的消息",
+        "timestamp": "时间戳"
+    }] | null
+}
+```
+
+
+## 六、实时聊天（websocket）
+
+实时聊天功能

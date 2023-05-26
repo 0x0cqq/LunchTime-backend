@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+from .chat.ChatViews import ChatListView
+
 urlpatterns = [
     path("", views.index, name="index"),
     path("register_without_verification", views.register_without_verification, name="register_without_verification"),
@@ -25,6 +27,8 @@ urlpatterns = [
     path("attention", views.followUser, name="attention"),
     path("attention_list", views.getAttentionList, name="attention_list"),
     path("hate", views.hateUser, name="hate"),
+
+    path("chats", ChatListView.as_view(), name = "chat"),
 
     path("modify_user_name", views.modifyUserName, name="modify_user_info"),
     path("modify_user_description", views.modifyUserDescription, name="modify_user_description"),
