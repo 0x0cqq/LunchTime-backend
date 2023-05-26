@@ -220,7 +220,7 @@ def getPosts(request: HttpRequest):
             post_user_name = query.first().name
             if target_user_name and target_user_name != post_user_name:
                 continue
-            if post.user_id in hate_user_id_list and target_user_name is None:
+            if post.user_id in hate_user_id_list and target_user_name == "":
                 continue
             tmp['post_id'] = post.post_id
             tmp['user_name'] = post_user_name
