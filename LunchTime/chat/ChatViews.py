@@ -11,7 +11,7 @@ class ChatListView(APIView):
         try:
             user = User.objects.get(name=username)
         except User.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'user does not exist'})
+            return JsonResponse({'status': False, 'message': 'user does not exist'})
         user_id = user.id
         # use user to filter all chat messages, in receiver or sender field
         chat_list = ChatMessage.objects.filter(sender_id=user_id)
@@ -39,11 +39,11 @@ class ChatListView(APIView):
         ]
         # combine all information into a dict
         chat_list = {
-            'status': 'success',
+            'status': True,
             'chat_list': [ {
                 'user_name': persons_user_name[i],
-                'user_image': persons_user_image[i],
-                'message': messages[i],
+                'user_avatar': persons_user_image[i],
+                'content': messages[i],
                 'timestamp': timestamp[i]
             } for i in range(len(persons))
         ]}

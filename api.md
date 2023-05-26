@@ -487,12 +487,12 @@
 
 ```json
 {
-    "status": "ok" | "error",
+    "status": true | false,
     "message": "错误信息" | null,
     "chat_list": [{
         "user_name" : "用户名",
-        "user_image": "头像 URL" ,
-        "message": "最近的消息",
+        "user_avatar": "头像 URL" ,
+        "content": "最近的消息",
         "timestamp": "时间戳"
     }] | null
 }
