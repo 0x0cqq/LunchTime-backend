@@ -72,8 +72,9 @@
 ```json
 {
     "user_name":,
-    "type": , // 0->time 1->popularity 2->comment 3->attention
+    "type": , // 0->time 1->popularity 2->comment
     "target_user_name": , // empty means all users
+    "filter": , // 0->no filter 1->following
 }
 ```
 - Response

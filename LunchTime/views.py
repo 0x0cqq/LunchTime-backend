@@ -200,6 +200,7 @@ def getPosts(request: HttpRequest):
         user_name = request.GET.get('user_name')
         type = int(request.GET.get('type'))
         target_user_name = request.GET.get('target_user_name')
+        filter_type = int(request.GET.get('filter'))
         # get user id
         query = User.objects.filter(name=user_name)
         if not query:
@@ -279,9 +280,22 @@ def getPosts(request: HttpRequest):
                     sorted_posts.append(post)
         else:
             sorted_posts = posts
+        filter_post = []
+        if filter_type == 1:
+            # filter sorted_posts by followings
+            queries = UserFollow.objects.filter(user_id=user_id)
+            follow_list = []
+            for q in queries:
+                # get user's name
+                query = User.objects.filter(id=q.follow_user_id)
+                follow_list.append(query.first().name)
+            for post in sorted_posts:
+                # check if post's user is in follow list
+                if post['user_name'] in follow_list:
+                    filter_post.append(post)
         res['status'] = True
         res['message'] = 'ok'
-        res['posts'] = sorted_posts
+        res['posts'] = filter_post
 
     except Exception as e:
         print(e)
