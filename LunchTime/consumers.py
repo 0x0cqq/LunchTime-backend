@@ -170,7 +170,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "type": "message",
                         "message": {
                             "user_name": sender_name,
-                            "avatar": ROOT_URL + MEDIA_URL + "userImage/" + sender_image,
+                            "user_avatar": ROOT_URL + MEDIA_URL + "userImage/" + sender_image,
                             "content": content,
                             "timestamp": timestamp,
                         }
