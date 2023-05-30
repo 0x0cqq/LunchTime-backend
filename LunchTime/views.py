@@ -293,6 +293,8 @@ def getPosts(request: HttpRequest):
                 # check if post's user is in follow list
                 if post['user_name'] in follow_list:
                     filter_post.append(post)
+        else:
+            filter_post = sorted_posts
         res['status'] = True
         res['message'] = 'ok'
         res['posts'] = filter_post
