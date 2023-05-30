@@ -1117,7 +1117,8 @@ def modifyUserImage(request: HttpRequest):
     try:
         # get parameters
         user_name = request.POST.get('user_name')
-        file = request.FILES.get('image')
+        filelist = request.FILES.getlist('image')
+        file = filelist[0]
         # check if user exists
         query = User.objects.filter(name=user_name)
         if not query:
