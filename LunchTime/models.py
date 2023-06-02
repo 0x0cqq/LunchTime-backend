@@ -40,6 +40,10 @@ class PostPicture(models.Model):
     post_id = models.IntegerField()
     url = models.CharField(max_length=200)
 
+class PostVideo(models.Model):
+    post_id = models.IntegerField()
+    url = models.CharField(max_length=200)
+
 class PostLove(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()

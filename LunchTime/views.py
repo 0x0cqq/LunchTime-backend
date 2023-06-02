@@ -243,6 +243,7 @@ def getPosts(request: HttpRequest):
             tmp['comment_count'] = post.comment_count
             tmp['save_count'] = post.save_count
             tmp['picture'] = []
+            tmp['video'] = []
             tmp['popularity'] = post.popularity
             # check if user has loved this post
             query = PostLove.objects.filter(post_id=post.post_id, user_id=user_id)
@@ -260,6 +261,15 @@ def getPosts(request: HttpRequest):
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
                 tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
+            # get video list
+            queries = PostVideo.objects.filter(post_id=post.post_id)
+            for q in queries:
+                tmp['video'].append(ROOT_URL + MEDIA_URL + "postVideo/" + q.url)
+            # set is video
+            if len(queries) > 0:
+                tmp['is_video'] = True
+            else:
+                tmp['is_video'] = False
             posts.append(tmp)
         if type == 0:
             sorted_posts = sorted(posts, key=lambda x: x["create_time"], reverse=True)
@@ -360,6 +370,7 @@ def getPostsSaved(request: HttpRequest):
             tmp['comment_count'] = post.comment_count
             tmp['save_count'] = post.save_count
             tmp['picture'] = []
+            tmp['video'] = []
             tmp['popularity'] = post.popularity
             # check if user has loved this post
             query = PostLove.objects.filter(post_id=post.post_id, user_id=user_id)
@@ -377,6 +388,15 @@ def getPostsSaved(request: HttpRequest):
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
                 tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
+            # get video list
+            queries = PostVideo.objects.filter(post_id=post.post_id)
+            for q in queries:
+                tmp['video'].append(ROOT_URL + MEDIA_URL + "postVideo/" + q.url)
+            # set is video
+            if len(queries) > 0:
+                tmp['is_video'] = True
+            else:
+                tmp['is_video'] = False
             posts.append(tmp)
         res['status'] = True
         res['message'] = 'ok'
@@ -500,6 +520,7 @@ def getPostsBySearch(request: HttpRequest):
             tmp['comment_count'] = post.comment_count
             tmp['save_count'] = post.save_count
             tmp['picture'] = []
+            tmp['video'] = []
             tmp['popularity'] = post.popularity
             # check if user has loved this post
             query = PostLove.objects.filter(post_id=post.post_id, user_id=user_id)
@@ -517,6 +538,15 @@ def getPostsBySearch(request: HttpRequest):
             queries = PostPicture.objects.filter(post_id=post.post_id)
             for q in queries:
                 tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
+            # get video list
+            queries = PostVideo.objects.filter(post_id=post.post_id)
+            for q in queries:
+                tmp['video'].append(ROOT_URL + MEDIA_URL + "postVideo/" + q.url)
+            # set is video
+            if len(queries) > 0:
+                tmp['is_video'] = True
+            else:
+                tmp['is_video'] = False
             posts.append(tmp)
         res['posts'] = posts
         res['status'] = True
@@ -589,7 +619,18 @@ def getPostDetail(request : HttpRequest):
         queries = PostPicture.objects.filter(post_id=post_id)
         for q in queries:
             tmp['picture'].append(ROOT_URL + MEDIA_URL + "postImage/" + q.url)
+        # get video list
+        tmp['video'] = []
+        queries = PostVideo.objects.filter(post_id=post.post_id)
+        for q in queries:
+            tmp['video'].append(ROOT_URL + MEDIA_URL + "postVideo/" + q.url)
+        # set is video
+        if len(queries) > 0:
+            tmp['is_video'] = True
+        else:
+            tmp['is_video'] = False
         res['post'] = tmp
+        
         # add comment list
         comments = []
         queries = PostComment.objects.filter(post_id=post_id)
@@ -665,6 +706,19 @@ def post(request: HttpRequest):
             # add picture to database
             picture = PostPicture(post_id=post.post_id, url=file_name)
             picture.save()
+        # get video list
+        files = request.FILES.getlist('video')
+        for index, file in enumerate(files):
+            file_dir = './media/postVideo/'
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
+            file_name =  str(int(time())) + "_" + str(index) + '.' + file.name.split('.')[-1]
+            file_path = file_dir + file_name
+            with open(file_path,'wb+') as f:
+                f.write(file.read())
+            # add video to database
+            video = PostVideo(post_id=post.post_id, url=file_name)
+            video.save()
         res['status'] = True
         res['message'] = "ok"
         res['post_id'] = post.post_id

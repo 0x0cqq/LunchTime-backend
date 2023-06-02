@@ -91,6 +91,8 @@
         "title":,
         "content":,
         "picture":[] , //其中为图片的url链接
+		"is_video": ,
+		"video": [], //其中为视频的url链接
         "location":,
         "love_count":,
         "comment_count":,
@@ -124,6 +126,8 @@
         "title":,
         "content":,
         "picture":[] , //其中为图片的url链接
+		"is_video": ,
+		"video": [], //其中为视频的url链接
         "location":,
         "love_count":,
         "comment_count":,
@@ -160,6 +164,8 @@
         "title":,
         "content":,
         "picture":[] , //其中为图片的url链接
+		"is_video": ,
+		"video": [], //其中为视频的url链接
         "location":,
         "love_count":,
         "comment_count":,
@@ -194,6 +200,8 @@
         "title":,
         "content":,
         "picture":[] , //其中为图片的url链接
+		"is_video": ,
+		"video": [], //其中为视频的url链接
         "location":,
         "love_count":,
         "comment_count":,
@@ -220,6 +228,7 @@
     "title": ,
     "content": ,
     "picture": [] ,
+	"video": [],
     "location": ,
 }
 ```
