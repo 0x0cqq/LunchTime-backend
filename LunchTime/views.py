@@ -274,7 +274,7 @@ def getPosts(request: HttpRequest):
         if type == 0:
             sorted_posts = sorted(posts, key=lambda x: x["create_time"], reverse=True)
         elif type == 1:
-            sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
+            sorted_posts = sorted(posts, key=lambda x: x["love_count"], reverse=True)
         elif type == 2:
             sorted_posts = sorted(posts, key=lambda x: x["comment_count"], reverse=True)
         elif type == 3:
@@ -292,6 +292,8 @@ def getPosts(request: HttpRequest):
             sorted_posts = posts
         filter_post = []
         if filter_type == 1:
+            sorted_posts = sorted(sorted_posts, key=lambda x: x["popularity"], reverse=True)
+        if filter_type == 2:
             # filter sorted_posts by followings
             queries = UserFollow.objects.filter(user_id=user_id)
             follow_list = []
