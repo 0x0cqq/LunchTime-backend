@@ -423,6 +423,9 @@ def getPostsBySearch(request: HttpRequest):
         user_name = request.GET.get('user_name')
         keyword = request.GET.get('keyword')
         field = request.GET.get('field')
+        type = request.GET.get('type')
+        if type is not None:
+            type = int(type)
         # get user id
         query = User.objects.filter(name=user_name)
         if not query:
@@ -550,7 +553,15 @@ def getPostsBySearch(request: HttpRequest):
             else:
                 tmp['is_video'] = False
             posts.append(tmp)
-        res['posts'] = posts
+        if type == 0:
+            sorted_posts = sorted(posts, key=lambda x: x["create_time"], reverse=True)
+        elif type == 1:
+            sorted_posts = sorted(posts, key=lambda x: x["love_count"], reverse=True)
+        elif type == 2:
+            sorted_posts = sorted(posts, key=lambda x: x["comment_count"], reverse=True)
+        else:
+            sorted_posts = sorted(posts, key=lambda x: x["popularity"], reverse=True)
+        res['posts'] = sorted_posts
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:

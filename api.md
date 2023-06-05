@@ -148,6 +148,7 @@
     "user_name":,
     "keyword":,
     "field":, //'all', 'title', 'tag', 'content', 'username'
+    "type":, //0->time 1->love 3-> comment
 }
 ```
 - Response
