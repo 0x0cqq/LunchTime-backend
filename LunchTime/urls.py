@@ -23,6 +23,7 @@ urlpatterns = [
     path("comment_post", views.commentPost, name="comment_post"),
     
     path("notice", views.getNotice, name="get_notice"),
+    path("read_notice", views.readNotice, name="notice_read"),
 
     path("attention", views.followUser, name="attention"),
     path("attention_list", views.getAttentionList, name="attention_list"),

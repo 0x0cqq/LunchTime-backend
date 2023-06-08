@@ -317,8 +317,29 @@
             "content":, //评论的内容
             "post_id":, //帖子id
             "picture":, //帖子的第一张图片
+            "is_read":,
         },
     ],
+    "status":,
+    "message":,
+}
+```
+
+### 已读评论/点赞通知
+- POST: api/read_notice
+- Param:
+```json
+{
+    "user_name":,           // the user who send this message
+    "target_user_name":,
+    "type":,                // "comment", "love",
+    "create_time":,         // if type == "comment"
+    "post_id":,
+}
+```
+- Response:
+```json
+{
     "status":,
     "message":,
 }
@@ -504,12 +525,27 @@
         "user_name" : "用户名",
         "user_avatar": "头像 URL" ,
         "content": "最近的消息",
-        "timestamp": "时间戳"
+        "timestamp": "时间戳",
+        "unread_num": "未读消息数", 
     }] | null
 }
 ```
 
+#### POST
 
+* Parmas:
+    * `user_name`: "查看消息的用户"
+    * `target_user_name`: "该用户的聊天对象"
+* Response:
+
+```json
+{
+    "status": true | false,
+    "message": "错误信息" | null,
+}
+```
+
+    
 ## 六、实时聊天（websocket）
 
 实时聊天功能

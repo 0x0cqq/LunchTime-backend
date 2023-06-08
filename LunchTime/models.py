@@ -48,6 +48,7 @@ class PostLove(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
     create_time = models.DateTimeField(auto_now=True)
+    isRead = models.BooleanField(default=False)
     def __str__(self):
         return "postId: " + str(self.post_id) + "  userId: " + str(self.user_id)
 
@@ -63,6 +64,7 @@ class PostComment(models.Model):
     user_id = models.IntegerField()
     create_time = models.DateTimeField(auto_now_add=True)
     comment = models.CharField(max_length=200)
+    isRead = models.BooleanField(default=False)
 
 class UserFollow(models.Model):
     user_id = models.IntegerField()
@@ -86,6 +88,7 @@ class ChatMessage(models.Model):
     receiver_id = models.IntegerField()
     create_time = models.DateTimeField()
     message = models.CharField(max_length=2000)
+    isRead = models.BooleanField(default=False)
     def __str__(self):  
         return "senderId: " + str(self.sender_id) + "  receiverId: " + str(self.receiver_id) + "  message: " + self.message
     

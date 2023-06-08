@@ -6,7 +6,11 @@ from LunchTime.utils import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
+from LunchTime.notice.NoticeViews import sendSystemNotice
+import json
 import os
+import datetime
+import traceback
 from time import time
 
 from backend.settings import ROOT_URL, MEDIA_URL
@@ -786,6 +790,18 @@ def lovePost(request: HttpRequest):
             post.love_count += 1
             post.save()
             res['result'] = 1
+            # send notice to post owner
+            target_user_id = post.user_id
+            system_notice = {
+                "type" : "love",
+                "user_id" : user_id,
+                "target_user_id" : target_user_id,
+                "post_id" : post_id,
+                "content" : "点赞了你的帖子"
+            }
+            # pack system notice to json
+            system_notice = json.dumps(system_notice)
+            sendSystemNotice(system_notice)
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
@@ -827,6 +843,18 @@ def commentPost(request: HttpRequest):
         post.popularity = calculate_popularity(post.love_count, post.comment_count + 1, post.save_count)
         post.comment_count += 1
         post.save()
+        # send notice to post owner
+        target_user_id = post.user_id
+        system_notice = {
+            "type" : "comment",
+            "user_id" : user_id,
+            "target_user_id" : target_user_id,
+            "post_id" : post_id,
+            "content" : comment.comment,
+        }
+        # pack system notice to json
+        system_notice = json.dumps(system_notice)
+        sendSystemNotice(system_notice)
         res['status'] = True
         res['message'] = 'ok'
     except Exception as e:
@@ -929,6 +957,7 @@ def getNotice(request: HttpRequest):
                 tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = item.comment
+                tmp['is_read'] = item.isRead
                 q = PostPicture.objects.filter(post_id=item.post_id)
                 if q:
                     tmp['picture'] = ROOT_URL + MEDIA_URL + "postImage/" + q.first().url
@@ -955,6 +984,7 @@ def getNotice(request: HttpRequest):
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = ""
                 tmp['picture'] = ""
+                tmp['is_read'] = item.isRead
                 noticeList.append(tmp)
         else:
             pass
@@ -963,6 +993,63 @@ def getNotice(request: HttpRequest):
         res['message'] = 'ok'
     except Exception as e:
         print(e)
+        res['status'] = False
+        res['message'] = 'unexpected parameters'
+    return JsonResponse(res)
+
+@api_view(['POST'])
+def readNotice(request: HttpRequest):
+    res = {}
+    if request.method != "POST":
+        res['status'] = False
+        res['message'] = 'false method'
+        return JsonResponse(res)
+    try:
+        # get parameters
+        user_name = request.POST.get('user_name')
+        target_user_name = request.POST.get('target_user_name')
+        type = request.POST.get('type')
+        post_id = int(request.POST.get('post_id'))
+        # get user id
+        query = User.objects.filter(name=user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'user does not exist'
+            return JsonResponse(res)
+        user_id = query.first().id
+        # get target user id
+        query = User.objects.filter(name=target_user_name)
+        if not query:
+            res['status'] = False
+            res['message'] = 'target user does not exist'
+            return JsonResponse(res)
+        target_user_id = query.first().id
+        # get notice item
+        if type == 'comment':
+            # get create_time
+            create_time = request.POST.get('create_time')
+            print("create_time_receive:", create_time)
+            queries = PostComment.objects.filter(post_id=post_id, user_id=target_user_id)
+            for query in queries:
+                print("create_time_in_database:", query.create_time.timestamp().__floor__())
+                if str(query.create_time.timestamp().__floor__()) == str(create_time):
+                    query.isRead = True
+                    query.save()
+        if type == "love":
+            query = PostLove.objects.filter(post_id=post_id, user_id=target_user_id)
+            if query:
+                love_item = query.first()
+                love_item.isRead = True
+                love_item.save()
+            else:
+                res['status'] = False
+                res['message'] = 'love item does not exist'
+                return JsonResponse(res)            
+        res['message'] = 'ok'
+        res['status'] = True
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
         res['status'] = False
         res['message'] = 'unexpected parameters'
     return JsonResponse(res)
