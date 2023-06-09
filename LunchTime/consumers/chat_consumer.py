@@ -5,7 +5,7 @@ import channels.layers
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import User, ChatMessage, UserInfo
+from ..models import User, ChatMessage, UserInfo
 from urllib.parse import parse_qsl
 from typing import *
 
