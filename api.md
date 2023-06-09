@@ -561,7 +561,7 @@ URL params:
 
 ### 消息格式
 
-> 采用 JSON 序列化成为字符形式发送
+> 采用 JSON 序列化成为字符串形式发送
 
 发送信息（客户端 -> 服务器）：
 
@@ -586,3 +586,12 @@ URL params:
 URL params:
 
 * `user_name: string`: 需要请求的用户名
+
+### 消息格式
+
+> 采用 JSON 格式化为字符串形式发送
+
+* `type: "comment" | "love" | "follow" | "chat" `: 消息类型
+* `user_name: string`: 来源的用户名（点赞的人）
+* `content: string`: 要显示的信息
+* `url: string?`: 预留的跳转深链接
