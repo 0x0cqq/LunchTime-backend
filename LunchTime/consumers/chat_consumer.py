@@ -141,6 +141,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message=content,
                 create_time=time,
             ))
+
+            await database_sync_to_async(sendSystemNotice)(json.dumps({
+                "type": "chat",
+                "user_id": self.send_user_id,
+                "target_user_id": self.receive_user_id,
+                "content": content,
+            }))
         elif text_data_json["type"] == "history":
             chat_list = await self.get_history(self.send_user_id, self.receive_user_id)
             chat_list = await self.transform_chat_to_json(chat_list)
@@ -166,12 +173,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if receiver_id == self.send_user_id:
             sender_name = await self.get_user_name_from_id(sender_id)
             sender_image = await self.get_user_image_from_id(sender_id)
-            sendSystemNotice(json.dumps({
-                "type": "chat",
-                "user_id": sender_id,
-                "target_user_id": receiver_id,
-                "content": content,
-            }))
             await self.send(
                 text_data=json.dumps(
                     {
