@@ -619,6 +619,15 @@ def getPostDetail(request : HttpRequest):
         tmp['love_count'] = post.love_count
         tmp['save_count'] = post.save_count
         tmp['comment_count'] = post.comment_count
+        tmp['user_status'] = 1
+        # check if user followed this user
+        query = UserFollow.objects.filter(user_id=user_id, follow_user_id=post.user_id)
+        if query:
+            tmp['user_status'] = 2
+        # check if user hate this user
+        query = UserHate.objects.filter(user_id=user_id, hate_user_id=post.user_id)
+        if query:
+            tmp['user_status'] = 3
         # check if user has loved this post
         query = PostLove.objects.filter(post_id=post_id, user_id=user_id)
         if query:

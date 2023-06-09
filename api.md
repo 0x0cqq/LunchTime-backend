@@ -1,4 +1,4 @@
-# API文档
+# 	API文档
 
 - POST 请求参数以表单形式从前端发送
 - GET 请求参数以Params形式从前端发送
@@ -196,6 +196,7 @@
         "post_id": ,
         "user_name": ,
         "user_image": ,
+        "user_status":,
         "create_time":,
         "tag":,
         "title":,
@@ -545,7 +546,7 @@
 }
 ```
 
-    
+
 ## 六、实时聊天（websocket）
 
 实时聊天功能
