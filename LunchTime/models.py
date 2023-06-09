@@ -26,7 +26,7 @@ class VerifyEmail(models.Model):
 class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
     user_id = models.IntegerField()
-    create_time = models.DateTimeField(auto_now_add=True)
+    create_time = models.DateTimeField(auto_now=True)
     tag = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     content = models.CharField(max_length=1000)
@@ -62,7 +62,7 @@ class PostSave(models.Model):
 class PostComment(models.Model):
     post_id = models.IntegerField()
     user_id = models.IntegerField()
-    create_time = models.DateTimeField(auto_now_add=True)
+    create_time = models.DateTimeField(auto_now=True)
     comment = models.CharField(max_length=200)
     isRead = models.BooleanField(default=False)
 
