@@ -548,4 +548,25 @@
     
 ## 六、实时聊天（websocket）
 
-实时聊天功能
+### URL
+
+`ws://BASE_URL/ws/chat`
+
+URL params:
+
+* `sender_name` 发送者的用户名
+* `receiver_name` 接收者的用户名
+
+### websocket 消息格式
+
+> 采用 JSON 序列化成为字符形式发送
+
+发送信息（客户端 -> 服务器）：
+
+* `user_name: string`: 发送者的用户名
+* `content:string `: 消息的内容
+
+
+## 七、实时通知
+
+在后台开启长 Websocket 连接来获取后端的通知信息的及时更新
