@@ -988,11 +988,13 @@ def getNotice(request: HttpRequest):
                 user_info = query.first()
                 tmp['user_image'] = ROOT_URL + MEDIA_URL + 'userImage/' + user_info.image
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
-                tmp['content'] = ""
                 q = PostPicture.objects.filter(post_id=item.post_id)
+                if q:
+                    tmp['picture'] = ROOT_URL + MEDIA_URL + "postImage/" + q.first().url
+                else:   
+                    tmp['picture'] = ""
                 tmp['create_time'] = item.create_time.timestamp().__floor__()
                 tmp['content'] = ""
-                tmp['picture'] = ""
                 tmp['is_read'] = item.isRead
                 noticeList.append(tmp)
         else:
