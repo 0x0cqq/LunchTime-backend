@@ -5,6 +5,8 @@ import channels.layers
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+
+from LunchTime.notice.NoticeViews import sendSystemNotice
 from ..models import User, ChatMessage, UserInfo
 from urllib.parse import parse_qsl
 from typing import *
@@ -164,6 +166,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if receiver_id == self.send_user_id:
             sender_name = await self.get_user_name_from_id(sender_id)
             sender_image = await self.get_user_image_from_id(sender_id)
+            sendSystemNotice(json.dumps({
+                "type": "chat",
+                "user_id": sender_id,
+                "target_user_id": receiver_id,
+                "content": content,
+            }))
             await self.send(
                 text_data=json.dumps(
                     {
