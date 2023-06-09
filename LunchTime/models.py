@@ -91,4 +91,14 @@ class ChatMessage(models.Model):
     isRead = models.BooleanField(default=False)
     def __str__(self):  
         return "senderId: " + str(self.sender_id) + "  receiverId: " + str(self.receiver_id) + "  message: " + self.message
-    
+
+
+class Client(models.Model):
+    # client_id is auto generated
+    # user_id is the id of the user who is using this client
+    # channel_name is the django channel name of the client
+    client_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    channel_name = models.CharField(max_length=200)
+    def __str__(self):
+        return "clientId: " + str(self.client_id) + "  userId: " + str(self.user_id) + "  channelName: " + self.channel_name
