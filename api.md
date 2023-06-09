@@ -546,7 +546,53 @@
 }
 ```
 
+    
+## 六、实时聊天
 
-## 六、实时聊天（websocket）
+通过 websocket 来实现消息的实时收发
 
-实时聊天功能
+### Websocket URL
+
+`ws://BASE_URL/ws/chat`
+
+URL params:
+
+* `sender_name` 发送者的用户名
+* `receiver_name` 接收者的用户名
+
+### 消息格式
+
+> 采用 JSON 序列化成为字符串形式发送
+
+发送信息（客户端 -> 服务器）：
+
+* `user_name: string`: 发送者的用户名
+* `content: string `: 消息的内容
+
+接收消息（服务器 -> 客户端）:
+
+* `user_name: string`: 发送者的用户名
+* `user_avatar: string`: 发送者的头像
+* `content: string`: 消息内容
+* `timestamp: int`: 消息发送的时间戳
+
+## 七、实时通知
+
+在后台开启长 Websocket 连接来获取后端的通知信息的及时更新
+
+### URL
+
+`ws://BASE_URL/ws/notice`
+
+URL params:
+
+* `user_name: string`: 需要请求的用户名
+
+### 消息格式
+
+> 采用 JSON 格式化为字符串形式发送
+
+* `type: "comment" | "love" | "follow" | "chat" `: 消息类型
+* `user_name: string`: 来源的用户名（点赞的人）
+* `content: string`: 要显示的信息
+* `url: string?`: 预留的跳转深链接
