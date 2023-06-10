@@ -749,6 +749,18 @@ def post(request: HttpRequest):
         res['message'] = "ok"
         res['post_id'] = post.post_id
 
+        # send messages to all fans
+        # get user's fans
+        followUsers = UserFollow.objects.filter(follow_user_id=user_id)
+        for followUser in followUsers:
+            sendSystemNotice(json.dumps({
+                "user_id": user_id,
+                "type": "follow",
+                "content": user_name + " 发布了新的帖子",
+                "target_user_id": followUser.user_id,
+            }))
+
+
     except Exception as e:
         print(e)
         res['status'] = False
